@@ -1,0 +1,8 @@
+opencv-python
+pyglet
+gTTS
+python-vlc
+geopy
+ip2geotools
+Nominatim
+face_recognition
