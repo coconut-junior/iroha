@@ -2,6 +2,7 @@ import gtts
 from gtts import gTTS
 import vlc #pip install python-vlc
 import weather
+import filters
 
 owner = 'jimmy' #this can be changed with a transfer ownership command
 greetings = ['']
@@ -9,7 +10,8 @@ greetings = ['']
 def say(text):
     tts = gTTS(text)
     tts.save('speech.mp3')
-    p = vlc.MediaPlayer("speech.mp3")
+    filters.pitch()
+    p = vlc.MediaPlayer("output.mp3")
     p.play()
     print(text)
 
