@@ -9,20 +9,6 @@ import speech
 #Copyright 2021 Project Iroha
 #============================
 
-#todo
-#how can this improve the lives of those with disabilities?
-
-#basic functions
-#===============
-#respond to simple commands using snowboy module
-#at least 3 tones of voice
-#movable ears
-#file sorting on computer
-#can tell the weather
-#remind you
-#recognize people
-
-
 emotion = "neutral"
 animation = pyglet.image.load_animation('bootup.gif')
 eyes = pyglet.sprite.Sprite(animation)
@@ -55,7 +41,7 @@ def report():
     time.sleep(3.5)
     speech.say('the humidity is ' + str(weather.humidity) + '%')
     time.sleep(3)
-    speech.say('good morning! ' + speech.owner)
+    speech.say('good morning ' + speech.owner)
     time.sleep(2)
 
 t = threading.Timer(0, report)
