@@ -6,3 +6,4 @@ geopy
 ip2geotools
 Nominatim
 face_recognition
+Python-map

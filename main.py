@@ -4,20 +4,19 @@ import threading
 import random
 import weather
 import speech
+import filters
+import os
 
 #============================
 #Copyright 2021 Project Iroha
 #============================
 
 emotion = "neutral"
-animation = pyglet.image.load_animation('bootup.gif')
+animation = pyglet.image.load_animation('faces/bootup.gif')
 eyes = pyglet.sprite.Sprite(animation)
 img = pyglet.image.load('crt_filter.png')
 crt = pyglet.sprite.Sprite(img)
 tasks = []
-
-w = eyes.width
-h = eyes.height
 
 weather.getWeather()
 
@@ -29,7 +28,7 @@ pyglet.gl.glClearColor(0,0,0,1)
 def on_draw():
     window.clear()
     eyes.draw()
-    crt.draw()
+    #crt.draw()
 
 def update(dt):
     if emotion == "scared":
@@ -43,6 +42,8 @@ def report():
     time.sleep(3)
     speech.say('good morning ' + speech.owner)
     time.sleep(2)
+    speech.say('would you like to hear the news today?')
+    import network
 
 t = threading.Timer(0, report)
 t.start()
