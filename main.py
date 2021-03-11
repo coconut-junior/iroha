@@ -11,6 +11,10 @@ import os
 #Copyright 2021 Project Iroha
 #============================
 
+#on macOS do (apt-get on linux)
+#brew install portaudio
+#brew install nmap
+
 emotion = "neutral"
 animation = pyglet.image.load_animation('faces/bootup.gif')
 eyes = pyglet.sprite.Sprite(animation)

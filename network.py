@@ -1,6 +1,6 @@
 import os
 import sys
-import nmap                         # import nmap.py
+import nmap
 import time
 import re
 import speech
@@ -86,5 +86,5 @@ while True:
 
     # DANGER!!!
     if not ((new_count <= old_count) or startCounter >= 0) and not device_name == 'unknown':
-        speech.say(device_name + ' device just connected')
+        speech.say(device_name + ' device just connected to the network')
         time.sleep(4)

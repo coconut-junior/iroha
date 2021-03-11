@@ -6,10 +6,7 @@ import filters
 import random
 import time
 import speech_recognition as sr
-
-#on macOS do 
-#brew install portaudio
-#brew install nmap
+import requests, json
 
 owner = 'jimmy' #this can be changed with a transfer ownership command
 greetings = ['']
@@ -37,3 +34,21 @@ def weather_report():
         say('report: the sky is overcast. suggestion: spend a productive day indoors')
     if weather.report == 'clear sky':
         say('report: the sky is free of clouds. suggestion: spend time outdoors')
+
+def random_advice():
+    j = requests.get('https://api.adviceslip.com/advice').json()
+    return j['slip']['advice']
+
+def specific_advice(term):
+    j = requests.get('https://api.adviceslip.com/advice/search/' + term).json()
+    advice = ""
+    slips = len(j['slips']) - 1
+    
+    try:
+        advice = j['slips'][random.randint(0, slips)]['advice']
+    except:
+        advice = "i'm not sure"
+
+    return advice
+
+print(specific_advice('help'))
