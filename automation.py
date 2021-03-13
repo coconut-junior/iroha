@@ -7,6 +7,7 @@ from twilio.rest import Client
 reminders = []
 uptime = 0
 phone_number = '4843021063'
+iroha_number = '+14842095486'
 
 #read write config
 def saveConfig():
@@ -42,15 +43,13 @@ def createReminder(title, time_date):
 
 def sendSMS(message):
     global phone_number
+    global iroha_number
     account_sid = 'AC7593ac316047b1a511e6068ec1e7623b'
     auth_token = 'ebe667fb960cc7228f8cfb5f99d32603'
     client = Client(account_sid, auth_token)
-    from_number = '+14842095486'
 
     client.messages.create(
         to = phone_number,
-        from_ = from_number,
+        from_ = iroha_number,
         body = message
     )
-    
-sendSMS('hey jimmy, my creator 😇')
