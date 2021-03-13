@@ -3,6 +3,7 @@ import time
 import speech
 import json
 from twilio.rest import Client
+import stamps
 
 reminders = []
 uptime = 0
@@ -53,3 +54,18 @@ def sendSMS(message):
         from_ = iroha_number,
         body = message
     )
+
+def getAnswer(text):
+    answer = ''
+    img = ''
+
+    if text == 'can you see this?':
+        answer = 'Yes i can! 😁'
+    elif text == 'coming home' or text == 'on my way!':
+        answer = 'See u soon 😘'
+    elif text == 'i love you':
+        img = stamps.love
+    else:
+        answer = 'Hmmm'
+
+    return [answer, img]
