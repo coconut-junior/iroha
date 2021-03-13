@@ -1,9 +1,12 @@
-opencv-python
 pyglet
-gTTS
+Gets
 python-vlc
 geopy
 ip2geotools
 Nominatim
 face_recognition
-Python-map
+python-nmap
+requests
+ip2geotools
+geopy
+SpeechRecognition

@@ -6,21 +6,24 @@ import weather
 import speech
 import filters
 import os
+import network
+import json
+import automation
 
-#============================
-#Copyright 2021 Project Iroha
-#============================
+#==================
+#2021 Project Iroha
+#==================
 
-#on macOS do (apt-get on linux)
+#on macOS brew, apt-get on linux
 #brew install portaudio
 #brew install nmap
+#brew install ffmpeg
 
 emotion = "neutral"
 animation = pyglet.image.load_animation('faces/bootup.gif')
 eyes = pyglet.sprite.Sprite(animation)
 img = pyglet.image.load('crt_filter.png')
 crt = pyglet.sprite.Sprite(img)
-tasks = []
 
 weather.getWeather()
 
@@ -34,11 +37,19 @@ def on_draw():
     eyes.draw()
     #crt.draw()
 
+@window.event       
+def on_close():
+    automation.saveConfig()
+    network.running = False
+
 def update(dt):
+    automation.uptime += 1 #ticks or 1/60 of a second
+
     if emotion == "scared":
         eyes.update(x=random.randint(0,10), y=random.randint(0,10))
 
 def report():
+    automation.loadConfig()
     time.sleep(2)
     speech.say('it is currently ' + str(weather.temperature) + ' degrees')
     time.sleep(3.5)
@@ -47,7 +58,7 @@ def report():
     speech.say('good morning ' + speech.owner)
     time.sleep(2)
     speech.say('would you like to hear the news today?')
-    import network
+    network.running = True
 
 t = threading.Timer(0, report)
 t.start()

@@ -1,6 +1,6 @@
 import gtts
 from gtts import gTTS
-import vlc #pip install python-vlc
+import vlc
 import weather
 import filters
 import random
@@ -9,6 +9,7 @@ import speech_recognition as sr
 import requests, json
 
 owner = 'jimmy' #this can be changed with a transfer ownership command
+name = 'iroha'
 greetings = ['']
 praises = ['well done', 'good job', 'impressive', 'wonderful', 'excellent']     
 
@@ -50,5 +51,3 @@ def specific_advice(term):
         advice = "i'm not sure"
 
     return advice
-
-print(specific_advice('help'))
