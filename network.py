@@ -5,6 +5,9 @@ import time
 import re
 import speech
 import socket
+import requests
+import automation
+import client
 
 try:
     nm = nmap.PortScanner()         # instance of nmap.PortScanner
@@ -22,7 +25,8 @@ device_count = 0
 ipv4 = socket.gethostbyname_ex(socket.gethostname())[-1]
 ipv4 = (ipv4[len(ipv4) -1])
 ipv4 = str(ipv4.split('.')[0] + '.0.0/24')
-running = False
+running = True #should be false
+thinking = False
 
 def seek():
     global device_name
@@ -48,7 +52,6 @@ def seek():
 
     for host in hostList:
         device_name = host[2]
-        print('Scan report for %s\nMAC Address: %s (%s)' % (host[0], host[1], host[2]))
 
     print('Number of hosts: ' + str(len(hostList)))
     return len(hostList)                # returns count
@@ -84,6 +87,15 @@ while running:
     old_count = new_count
     new_count = seek()
     device_count = new_count
+
+    #check for new tasks
+    task = client.get_inbox()
+    if not task == None:
+        thinking = True
+        print('executing task: ' + task)
+        automation.execute(task)
+        time.sleep(2)
+        thinking = False
 
     # DANGER!!!
     if not ((new_count <= old_count) or startCounter >= 0) and not device_name == 'unknown':

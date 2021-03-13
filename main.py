@@ -20,8 +20,9 @@ import automation
 #brew install ffmpeg
 
 emotion = "neutral"
-animation = pyglet.image.load_animation('faces/bootup.gif')
-eyes = pyglet.sprite.Sprite(animation)
+boot_anim = pyglet.image.load_animation('faces/bootup.gif')
+think_anim = pyglet.image.load_animation('faces/thinking.gif')
+eyes = pyglet.sprite.Sprite(boot_anim)
 img = pyglet.image.load('crt_filter.png')
 crt = pyglet.sprite.Sprite(img)
 
@@ -45,8 +46,8 @@ def on_close():
 def update(dt):
     automation.uptime += 1 #ticks or 1/60 of a second
 
-    if emotion == "scared":
-        eyes.update(x=random.randint(0,10), y=random.randint(0,10))
+    if network.thinking:
+        eyes = pyglet.sprite.Sprite(think_anim)
 
 def report():
     automation.loadConfig()
