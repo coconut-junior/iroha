@@ -18,4 +18,4 @@ lowpass = 1500
 
 def pitch():
     print(home_dir)
-    os.system(binary_dir + 'ffmpeg -y -i speech.mp3 -af "asetrate=44100*' + str(factor) + ',atempo=' + str(tempo) + ',aresample=44100, highpass=f=' + str(highpass) + ', lowpass=f=' + str(lowpass) + '" output.mp3')
+    os.system(binary_dir + 'ffmpeg -hide_banner -loglevel error -y -i speech.mp3 -af "asetrate=44100*' + str(factor) + ',atempo=' + str(tempo) + ',aresample=44100, highpass=f=' + str(highpass) + ', lowpass=f=' + str(lowpass) + '" output.mp3')

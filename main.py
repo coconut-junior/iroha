@@ -20,9 +20,10 @@ import automation
 #brew install ffmpeg
 
 emotion = "neutral"
-boot_anim = pyglet.image.load_animation('faces/bootup.gif')
-think_anim = pyglet.image.load_animation('faces/thinking.gif')
-eyes = pyglet.sprite.Sprite(boot_anim)
+boot_anim = pyglet.sprite.Sprite(pyglet.image.load_animation('faces/bootup.gif'))
+think_anim = pyglet.sprite.Sprite(pyglet.image.load_animation('faces/thinking.gif'))
+idle_anim = pyglet.sprite.Sprite(pyglet.image.load_animation('faces/idle.gif'))
+
 img = pyglet.image.load('crt_filter.png')
 crt = pyglet.sprite.Sprite(img)
 
@@ -35,7 +36,10 @@ pyglet.gl.glClearColor(0,0,0,1)
 @window.event
 def on_draw():
     window.clear()
-    eyes.draw()
+    if network.thinking:
+        think_anim.draw()
+    else:
+        idle_anim.draw()
     #crt.draw()
 
 @window.event       
@@ -44,10 +48,8 @@ def on_close():
     network.running = False
 
 def update(dt):
+    global eyes
     automation.uptime += 1 #ticks or 1/60 of a second
-
-    if network.thinking:
-        eyes = pyglet.sprite.Sprite(think_anim)
 
 def report():
     automation.loadConfig()

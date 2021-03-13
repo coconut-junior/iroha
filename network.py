@@ -25,7 +25,7 @@ device_count = 0
 ipv4 = socket.gethostbyname_ex(socket.gethostname())[-1]
 ipv4 = (ipv4[len(ipv4) -1])
 ipv4 = str(ipv4.split('.')[0] + '.0.0/24')
-running = True #should be false
+running = False #should be false
 thinking = False
 
 def seek():
