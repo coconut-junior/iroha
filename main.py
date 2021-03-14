@@ -50,6 +50,7 @@ def on_draw():
 @window.event       
 def on_close():
     automation.saveConfig()
+    network.running = False
 
 def update(dt):
     automation.uptime += 1 #ticks or 1/60 of a second
@@ -69,7 +70,9 @@ def report():
     time.sleep(2)
     speech.say('would you like to hear the news today?')
     network.running = True
-    network.scan()
+    t = threading.Thread(target=network.scan(),name='scanner',args=(''))
+    t.daemon = True
+    t.start()
 
 t = threading.Timer(0, report)
 t.start()

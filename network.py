@@ -118,7 +118,3 @@ def scan():
         if not ((new_count <= old_count) or startCounter >= 0) and not device_name == 'unknown':
             speech.say(device_name + ' device just connected to the network')
             time.sleep(4)
-
-t = threading.Thread(target=scan(),name='scanner',args=(''))
-t.daemon = True
-t.start()
