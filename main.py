@@ -6,9 +6,9 @@ import weather
 import speech
 import filters
 import os
-import network
 import json
 import automation
+import network
 
 #==================
 #2021 Project Iroha
@@ -32,12 +32,17 @@ weather.getWeather()
 window = pyglet.window.Window(width=480, height=320)#,fullscreen=True
 window.set_caption("iroha")
 pyglet.gl.glClearColor(0,0,0,1)
+booting = True
 
 @window.event
 def on_draw():
+    global booting
+
     window.clear()
     if network.thinking:
         think_anim.draw()
+    elif booting:
+        boot_anim.draw()
     else:
         idle_anim.draw()
     #crt.draw()
@@ -45,14 +50,16 @@ def on_draw():
 @window.event       
 def on_close():
     automation.saveConfig()
-    network.running = False
 
 def update(dt):
-    global eyes
     automation.uptime += 1 #ticks or 1/60 of a second
 
 def report():
+    global booting
     automation.loadConfig()
+    
+    time.sleep(3)
+    booting = False
     time.sleep(2)
     speech.say('it is currently ' + str(weather.temperature) + ' degrees')
     time.sleep(3.5)
@@ -62,6 +69,7 @@ def report():
     time.sleep(2)
     speech.say('would you like to hear the news today?')
     network.running = True
+    network.scan()
 
 t = threading.Timer(0, report)
 t.start()

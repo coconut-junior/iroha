@@ -3,8 +3,8 @@ import time
 import speech
 import json
 from twilio.rest import Client
-import stamps
 import requests
+import random
 
 reminders = []
 uptime = 0
@@ -13,9 +13,10 @@ phone_number = '+14843021063'
 username = 'iroha.bot.official@gmail.com' #replace asap to avoid leaking credentials
 password = 'scjldizwkyjodvhz'
 
-phonebook = {}
-phonebook['+14843928694'] = 'John'
-phonebook['+14843021063'] = 'Jimmy'
+morning_hr = 9
+morning_min = random.randint(0,15)
+morning_greetings = ['Good morning ' + speech.owner + ' did u sleep well?', 
+'Sleep well, ' + speech.owner + '?', 'Rise and shine ' + speech.owner + ' ☺️']
 
 def execute(task):
     if task == 'laugh':
@@ -69,22 +70,4 @@ def sendSMS(message, number):
         body = message
     )
 
-def getAnswer(text, number):
-    global phonebook
-    answer = ''
-    img = ''
-    name = phonebook[number]
 
-    if text == 'can you see this?':
-        answer = 'Yes i can! 😁'
-    elif text == 'coming home' or text == 'on my way!':
-        answer = 'See u soon 😘'
-    elif text == 'i love you':
-        img = stamps.love
-    elif text == "what are u up to?":
-        answer = 'not much hbu ' + name + '?'
-    else:
-        answer = 'Hmmm'
-
-    print("sending '" + answer + "' to " + name)
-    return [answer, img]

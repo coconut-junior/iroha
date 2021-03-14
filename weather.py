@@ -1,15 +1,25 @@
 import requests, json
 from ip2geotools.databases.noncommercial import DbIpCity
 from geopy.geocoders import Nominatim
+import time
 
 temperature = 0
 humidity = 0
 pressure = 0
 report = ''
+ip = ''
+
+def getIP():
+   global ip
+   try:
+      ip = requests.get('https://api.ipify.org').text
+   except:
+      print('could not connect to ipify, retrying...')
+      time.sleep(2000)
+      getIP()
 
 #get location from ip
-
-ip = requests.get('https://api.ipify.org').text
+getIP()
 print(ip)
 response = DbIpCity.get(str(ip), api_key='free')
 geolocator = Nominatim(user_agent="Your_Name")
