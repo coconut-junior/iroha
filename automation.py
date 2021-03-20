@@ -105,7 +105,15 @@ def createReminder(text):
         for c in range(len(text)):
             if text[c] in numbers:
                 i = c
-        text = text[:i] + 'am' + text[i:]
+
+        if 'morning' in text:
+            text = text.replace('morning','')
+            text = text[:i] + 'am' + text[i:]
+        elif 'night' in text:
+            text = text.replace('night', '')
+            text = text[:i] + 'pm' + text[i:]
+        else:
+            text = text[:i] + 'am' + text[i:]
 
     for t in times:
         try:
