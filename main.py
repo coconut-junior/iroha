@@ -24,15 +24,14 @@ boot_anim = pyglet.sprite.Sprite(pyglet.image.load_animation('faces/bootup.gif')
 think_anim = pyglet.sprite.Sprite(pyglet.image.load_animation('faces/thinking.gif'))
 idle_anim = pyglet.sprite.Sprite(pyglet.image.load_animation('faces/idle.gif'))
 
-img = pyglet.image.load('crt_filter.png')
-crt = pyglet.sprite.Sprite(img)
-
 weather.getWeather()
 
 window = pyglet.window.Window(width=480, height=320)#,fullscreen=True
 window.set_caption("iroha")
 pyglet.gl.glClearColor(0,0,0,1)
 booting = True
+
+automation.loadConfig()
 
 @window.event
 def on_draw():
@@ -45,7 +44,6 @@ def on_draw():
         boot_anim.draw()
     else:
         idle_anim.draw()
-    #crt.draw()
 
 @window.event       
 def on_close():
@@ -57,7 +55,6 @@ def update(dt):
 
 def report():
     global booting
-    automation.loadConfig()
     
     time.sleep(3)
     booting = False

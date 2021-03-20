@@ -11,7 +11,7 @@ elif os.name == 'posix':
 else:
     binary_dir = ''
 
-factor = 0.75
+factor = 0.7
 tempo = 0.9
 highpass = 200
 lowpass = 1500
