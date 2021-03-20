@@ -73,6 +73,7 @@ def add_years(d, years):
         raise
 
 def createReminder(text):
+    numbers = [':','0','1','2','3','4','5','6','7','8','9']
     print('setting reminder...')
 
     text=text.replace('please', "")
@@ -98,6 +99,14 @@ def createReminder(text):
     target_date = datetime.date.today()
     msg = ''
 
+    #if am/pm not specified decide which
+    if not 'am' in text and not 'pm' in text:
+        i = 0
+        for c in range(len(text)):
+            if text[c] in numbers:
+                i = c
+        text = text[:i] + 'am' + text[i:]
+
     for t in times:
         try:
 
@@ -107,9 +116,8 @@ def createReminder(text):
                     text=text.replace('pm','')
                 elif t == 'am':
                     text=text.replace('am','')
-
+                
                 #remove non-numbers
-                numbers = [':','0','1','2','3','4','5','6','7','8','9']
                 for c in text:
                     if not c in numbers:
                         text=text.replace(c,'')
@@ -158,7 +166,8 @@ def createReminder(text):
     if not hr == 0:
         msg = msg.strip()
         print('reminder set for ' + str(target_date) + ' at ' + str(hr)+':'+str(mn))
-        reminders.append(str(target_date) + ':' + msg)
+        #format is date, hour, minute
+        reminders.append(str(target_date) + ':' + str(hr) + ':' + str(min) + ':' + msg)
 
 def sendSMS(message, number):
     global iroha_number

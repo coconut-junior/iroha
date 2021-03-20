@@ -70,6 +70,7 @@ def getAnswer(text, number):
         else:
             answers = ['Not bad']
     elif ('remind me' in text) or ('set' in text and 'reminder' in text):
+        answers = ['You can count on me!', 'Sure thing!']
         automation.createReminder(text) #only use for testing on local machine
         #sendCmd('remind:' + text, number)
     elif text.startswith('what is '):
