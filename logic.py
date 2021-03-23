@@ -23,6 +23,15 @@ from nltk.corpus import wordnet
 
 #this will later be pulled from database
 bot_name = 'iroha'
+swear_words = []
+
+#load swear word list
+file1 = open('swear_words.txt','r')
+words = file1.readlines()
+for word in words:
+    word = word.rstrip() #remove \n
+    swear_words.append(word)
+
 phonebook = {}
 phonebook['+14843928694'] = 'John'
 phonebook['+14843021063'] = 'Jimmy'
@@ -82,7 +91,13 @@ def getAnswer(text, number):
     answers = ['']
     img = ''
     name = phonebook[number]
+    yelling = False
 
+    if text.isupper():
+        #yelling is bad, administer punishment
+        yelling = True
+
+    text=text.lower()
     #remove punctuation
     text=text.replace("'", "")
     text=text.replace('?', '')
@@ -92,6 +107,7 @@ def getAnswer(text, number):
     text=text.replace(' u ', ' you ')
     text=text.replace(' dat ', ' that ')
     text=text.replace(' wat ', ' what ')
+    text=text.replace('bc','because')
     text=text.replace('wut','what')
     text=text.replace('dont','do not')
     text=text.replace('omw', 'on my way')
@@ -99,6 +115,12 @@ def getAnswer(text, number):
     text=text.replace('hows', 'how is')
     text=text.replace('pls', 'please')
     text=text.replace('prolly', 'probably')
+    text=text.replace('hows', 'how is')
+
+    #because nobody gets the yours's right to hell with it
+    text=text.replace('your ', 'ur ')
+    text=text.replace("youre", 'ur')
+    text=text.replace("you are",'ur')
 
     #convert numbers
     text.replace('one','1')
@@ -112,10 +134,10 @@ def getAnswer(text, number):
     text.replace('nine','9')
 
     if text.startswith('can you see this'):
-        answers = ['Yes i can! 😁', "Well, I can't SEE exactly..."]
+        answers = ['Yes i can! 😁', "are you suggesting i'm blind?", 'of course i can']
     elif text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
         answers = ['Heyyy', "Hey " + name, "What's up? 😊"]
-    elif text.startswith('how are you') or text.startswith('how are u') or text.startswith('hows it'):
+    elif text.startswith('how are you') or text.startswith('how is it'):
         if weather.temperature < 45:
             answers = ['This cold weather has me dreaming of sandy beaches, fruity drinks and sunny days 😩',
             'I could honestly go for a warm cup of tea rn',
@@ -126,6 +148,9 @@ def getAnswer(text, number):
         answers = ['You can count on me!', 'Sure thing!']
         automation.createReminder(text) #only use for testing on local machine
         #sendCmd('remind:' + text, number)
+
+    elif text.startswith('who') and text.endswith('you'):
+        answers = ["i'm " + bot_name]
 
     #asking a what question
     elif text.startswith('what is ') or text.startswith('what does '):
@@ -138,6 +163,8 @@ def getAnswer(text, number):
             sent = text.split(' ')
             word = sent[len(sent) - 1]
             answers = [getAnt(word)]
+        elif 'ur name' in text:
+            answers = ["i'm " + bot_name]
         else:
             if not 'this' in text and not 'that' in text and not 'those' in text and not 'these' in text:
                 sent = text.split(' ')
@@ -151,8 +178,10 @@ def getAnswer(text, number):
     elif text.startswith('are you'):
         if text.startswith('are you ' + bot_name):
             answers = ['Well of course i am dummy', 'Pretty sure i am 🙄']
+        elif 'bot' in text or 'machine' in text or 'an ai' in text or 'artificial' in text:
+            answers = ["i'm real, promise!", "why would you think that? i'm a person too"]
         else:
-            answers = ['I am most certainly not!']
+            answers = ['I am most certainly not!','not at all','no lol who told you that']
 
     elif text.startswith('coming home') or text.startswith('on my way'):
         answers = ['See u soon 😘']
@@ -182,8 +211,15 @@ def getAnswer(text, number):
         #generic answers
         answers = ['Hmmm', 'Huh', 'okaaay', 'if you say so']
 
-    answer = answers[random.randint(0,len(answers)-1)]
     #lowercase is much cuter
     answer = answer.lower()
+
+    if yelling and not 'omg' in text and not 'lol' in text and not 'haha' in text and not 'yes' in text:
+        answers = ['WHY ARE YOU YELLING',"stop yelling you're scaring me"]
+
+    if any(element in text for element in swear_words):
+        answers = ['swearing is bad']
+
+    answer = answers[random.randint(0,len(answers)-1)]
     print("sending '" + answer + "' to " + name)
     return [answer, img]
