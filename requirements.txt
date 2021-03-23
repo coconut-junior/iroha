@@ -4,9 +4,7 @@ python-vlc
 geopy
 ip2geotools
 Nominatim
-face_recognition
 python-nmap
 requests
-ip2geotools
 geopy
-SpeechRecognition
+nltk

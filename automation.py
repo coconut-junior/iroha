@@ -131,8 +131,6 @@ def createReminder(text):
                         text=text.replace(c,'')
                         msg += c
 
-                print(msg)
-
                 args = text.split(t)
 
                 if ':' in text:
@@ -174,8 +172,13 @@ def createReminder(text):
     if not hr == 0:
         msg = msg.strip()
         print('reminder set for ' + str(target_date) + ' at ' + str(hr)+':'+str(mn))
-        #format is date, hour, minute
-        reminders.append(str(target_date) + ':' + str(hr) + ':' + str(min) + ':' + msg)
+
+        r = {}
+        r['date'] = str(target_date)
+        r['hour'] = hr
+        r['minute'] = mn
+        r['message'] = msg
+        reminders.append(r)
 
 def sendSMS(message, number):
     global iroha_number
