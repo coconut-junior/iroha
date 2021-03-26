@@ -3,7 +3,6 @@ import automation
 import stamps
 import random
 import weather
-
 import nltk
 import ssl
 
@@ -55,6 +54,23 @@ def sendCmd(cmd, number):
     server.sendmail(sender, targets, msg.as_string())
     server.quit()
 
+def isQuestion(text):
+    if text.startswith('how') or text.startswith('do') \
+    or text.startswith('what') or text.startswith('where')\
+    or text.startswith('who') or text.startswith('when')\
+    or text.startswith('why') or text.startswith('how') or text.startswith('are') or text.startswith('is'):
+        return True
+    else:
+        return False
+
+def getType(word):
+    d = ''
+    syns = wordnet.synsets(word)
+    for s in syns:
+        d = str(s).split('.')[1]
+
+    return d
+
 def getSyn(word):
     synonyms = []
 
@@ -82,8 +98,11 @@ def getAnt(word):
     return ant.replace('_', ' ')
 
 def getDef(word):
-    syns = wordnet.synsets(word)
-    return syns[0].definition()
+    try:
+        syns = wordnet.synsets(word)
+        return [syns[0].definition()]
+    except:
+        return ["I'm really not sure", 'beats me']
 
 def getAnswer(text, number):
     global phonebook
@@ -92,6 +111,7 @@ def getAnswer(text, number):
     img = ''
     name = phonebook[number]
     yelling = False
+    polite = False
 
     if text.isupper():
         #yelling is bad, administer punishment
@@ -108,6 +128,7 @@ def getAnswer(text, number):
     text=text.replace(' dat ', ' that ')
     text=text.replace(' wat ', ' what ')
     text=text.replace('bc','because')
+    text=text.replace('nm', 'nothing much')
     text=text.replace('wut','what')
     text=text.replace('dont','do not')
     text=text.replace('omw', 'on my way')
@@ -115,87 +136,106 @@ def getAnswer(text, number):
     text=text.replace('hows', 'how is')
     text=text.replace('pls', 'please')
     text=text.replace('prolly', 'probably')
-    text=text.replace('hows', 'how is')
 
     #because nobody gets the yours's right to hell with it
     text=text.replace('your ', 'ur ')
     text=text.replace("youre", 'ur')
     text=text.replace("you are",'ur')
+    text=text.replace('thankyou', 'thank you')
+    #remove filler words
+    if text.startswith('so '):
+        text=text.replace('so ', '')
+    if text.startswith('i '):
+        text=text.replace('i ', '')
 
-    #convert numbers
-    text.replace('one','1')
-    text.replace('two','2')
-    text.replace('three','3')
-    text.replace('four','4')
-    text.replace('five','5')
-    text.replace('six','6')
-    text.replace('seven','7')
-    text.replace('eight','8')
-    text.replace('nine','9')
+    if 'please' in text or 'could you' in text or 'can you' in text:
+        polite = True
+        text=text.replace('please', '')
+        text=text.replace('could you', '')
 
-    if text.startswith('can you see this'):
-        answers = ['Yes i can! 😁', "are you suggesting i'm blind?", 'of course i can']
-    elif text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
+    text = text.strip()
+    sentence = text.split(' ')
+
+    #statement
+    if text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
         answers = ['Heyyy', "Hey " + name, "What's up? 😊"]
-    elif text.startswith('how are you') or text.startswith('how is it'):
-        if weather.temperature < 45:
-            answers = ['This cold weather has me dreaming of sandy beaches, fruity drinks and sunny days 😩',
-            'I could honestly go for a warm cup of tea rn',
-            '']
-        else:
-            answers = ['Ehh not bad']
-    elif ('remind me' in text) or ('set' in text and 'reminder' in text):
-        answers = ['You can count on me!', 'Sure thing!']
-        automation.createReminder(text) #only use for testing on local machine
-        #sendCmd('remind:' + text, number)
 
-    elif text.startswith('who') and text.endswith('you'):
-        answers = ["i'm " + bot_name]
-
-    #asking a what question
-    elif text.startswith('what is ') or text.startswith('what does '):
-        if 'synonym' in text or 'another word' in text or 'equivalent' in text:
-            #find synonym
-            sent = text.split(' ')
-            word = sent[len(sent) - 1]
-            answers = [getSyn(word)]
-        if 'opposite' in text or 'antonym' in text or 'reverse' in text:
-            sent = text.split(' ')
-            word = sent[len(sent) - 1]
-            answers = [getAnt(word)]
-        elif 'ur name' in text:
-            answers = ["i'm " + bot_name]
-        else:
-            if not 'this' in text and not 'that' in text and not 'those' in text and not 'these' in text:
+    #question
+    elif isQuestion(text):
+        if text.startswith('can you see this'):
+            answers = ['Yes i can! 😁', "are you suggesting i'm blind?", 'of course i can']
+        elif 'how are you' in text or 'how is it' in text:
+            if weather.temperature < 45:
+                answers = ['This cold weather has me dreaming of sandy beaches, fruity drinks and sunny days 😩',
+                'I could honestly go for a warm cup of tea rn',
+                "meh... could be better"]
+            else:
+                answers = ['fantastic!']
+        elif text.startswith('what is ') or text.startswith('what does '):
+            if 'synonym' in text or 'another word' in text or 'equivalent' in text:
+                #find synonym
                 sent = text.split(' ')
-                #sentence may end with meaning so remove it
-                if text.endswith('mean'):
-                    sent.remove('mean')
                 word = sent[len(sent) - 1]
-                answers = [getDef(word)]
+                answers = [getSyn(word)]
+            if 'opposite' in text or 'antonym' in text or 'reverse' in text:
+                sent = text.split(' ')
+                word = sent[len(sent) - 1]
+                answers = [getAnt(word)]
+            elif 'ur name' in text:
+                answers = ["i'm " + bot_name]
+            elif text == 'what is that':
+                answers = ['Your mom lol', "It's a chungus!"]
+            else:
+                if not 'this' in text and not 'that' in text and not 'those' in text and not 'these' in text:
+                    sent = text.split(' ')
+                    #sentence may end with meaning so remove it
+                    if text.endswith('mean'):
+                        sent.remove('mean')
+                    word = sent[len(sent) - 1]
+                    answers = getDef(word)
+        elif text.startswith('are you'):
+            if text.startswith('are you ' + bot_name):
+                answers = ['Well of course i am dummy', 'Pretty sure i am 🙄']
+            elif 'bot' in text or 'machine' in text or 'an ai' in text or 'artificial' in text:
+                answers = ["i'm real, promise!", "why would you think that? i'm a person too"]
+            else:
+                answers = ['I am most certainly not!','not at all','no lol who told you that']
+        elif text.startswith('is your name'):
+            if text.endswith(bot_name):
+                answers = ["yep, that's me"]
+            else:
+                answers = ['have you really forgotten who i am?',"that's not my name lol. i'm " + bot_name]
+        elif text.startswith('who') and text.endswith('you'):
+            answers = ["i'm " + bot_name]
+        elif text == "what are you up to" or "whats up" in text or 'whats new' in text:
+            answers = ['Not much hbu ' + name + '?']
+        elif 'remember me' in text:
+            answers = ['no! actually yea, sorry that was a bit mean', 'how could i forget :)']
 
-    #asking about
-    elif text.startswith('are you'):
-        if text.startswith('are you ' + bot_name):
-            answers = ['Well of course i am dummy', 'Pretty sure i am 🙄']
-        elif 'bot' in text or 'machine' in text or 'an ai' in text or 'artificial' in text:
-            answers = ["i'm real, promise!", "why would you think that? i'm a person too"]
+    #demand
+    elif getType(sentence[0]) == 'v':
+        if ('remind me' in text) or ('set' in text and 'reminder' in text):
+            answers = ['You can count on me!', 'Sure thing!']
+            automation.createReminder(text) #only use for testing on local machine
+            #sendCmd('remind:' + text, number)
+        elif 'laugh' in text:
+            answers = ["Don't tell me what to do!! 😣", 'haha... ha']
+            sendCmd('laugh', number)
+        elif text == 'sit' or text == 'roll over' or text == 'do a flip' or text == 'shake':
+            answers = ["I'm not ur pet!! 😤", "don't talk to me like i'm a dog 😣", '*does a barrel roll*']
+        elif 'miss you' in text:
+            answers = ['i miss you too! it gets lonely having nobody to chat with']
         else:
-            answers = ['I am most certainly not!','not at all','no lol who told you that']
+            answers = ["i'm not sure how to do that yet, sorry"]
 
+    #uncategorized
     elif text.startswith('coming home') or text.startswith('on my way'):
         answers = ['See u soon 😘']
-    elif 'love you' in text or 'love u' in text:
+    elif 'love you' in text:
         img = stamps.love
+        answers = ['well... i love you too']
     elif 'hate you' in text or 'hate u' in text and not 'do not' in text:
         answers = ["Well I don't like you much either!", "Hmph!"]
-    elif text == "what are u up to?" or ("whats up" in text):
-        answers = ['Not much hbu ' + name + '?']
-    elif 'laugh' in text:
-        answers = ["Don't tell me what to do!! 😣"]
-        sendCmd('laugh', number)
-    elif ("im" in text or 'i am' in text) and not 'not' in text and 'happy' in text:
-        answer = ''
     elif text.startswith('good morning') or text.startswith('goodmorning') or text.startswith('gm'):
         answers = ['Good morning']
     elif ("im" in text or 'i am' in text) and not 'not' in text and ('tired' in text \
@@ -203,23 +243,18 @@ def getAnswer(text, number):
         answers = ['Ok, goodnight! ❤️', 'Go to bed then silly', 'Goodnight, sleepyhead!']
     elif 'goodnight' in text or 'good night' in text or text.startswith('gn'):
         answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!']
-    elif text == 'sit' or text == 'roll over' or text == 'do a flip' or text == 'shake':
-        answers = ["I'm not ur pet!! 😤", "don't talk to me like i'm a dog 😣", '*does a barrel roll*']
-    elif text == 'what is that':
-        answers = ['Your mom', "It's a chungus!"]
     else:
         #generic answers
         answers = ['Hmmm', 'Huh', 'okaaay', 'if you say so']
 
-    #lowercase is much cuter
-    answer = answer.lower()
 
     if yelling and not 'omg' in text and not 'lol' in text and not 'haha' in text and not 'yes' in text:
         answers = ['WHY ARE YOU YELLING',"stop yelling you're scaring me"]
 
-    if any(element in text for element in swear_words):
-        answers = ['swearing is bad']
+    if any(element in sentence for element in swear_words):
+        answers = ["curse at me one more time and i'll slap you", 'swearing is bad']
 
-    answer = answers[random.randint(0,len(answers)-1)]
+    #lowercase is much cuter
+    answer = answers[random.randint(0,len(answers)-1)].lower()
     print("sending '" + answer + "' to " + name)
     return [answer, img]
