@@ -8,8 +8,14 @@
     },
     "words": {
         "i": "",
+        "im": "",
+        "am": "",
         "so": "",
+        "anyhow": "",
         "anyways": "",
+        "seriously": "",
+        "well": "",
+        "about": "",
         "dat": "that",
         "wat": "what",
         "wut": "what",
@@ -24,6 +30,10 @@
         "prolly": "probably",
         "your": "ur",
         "youre": "ur",
-        "thankyou": "thank you"
+        "thankyou": "thank you",
+        "goodmorning": "good morning",
+        "gm": "good morning",
+        "goodnight": "good night",
+        "gn": "good night"
     }
 }

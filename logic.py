@@ -118,11 +118,10 @@ def getAnswer(text, number):
         #yelling is bad, administer punishment
         yelling = True
 
-    text=text.lower()
-    text = text.strip()
-    sentence = text.split(' ')
-
     with open ('word_corrections.json') as json_file:
+        text=text.lower()
+        text = text.strip()
+        sentence = text.split(' ')
         data = json.load(json_file)
         for key in data['punctuation'].keys():
             text = text.replace(key, data['punctuation'][key])
@@ -222,14 +221,14 @@ def getAnswer(text, number):
     elif 'love you' in text:
         img = stamps.love
         answers = ['well... i love you too']
-    elif 'hate you' in text or 'hate u' in text and not 'do not' in text:
+    elif 'hate you' and not 'do not' in text:
         answers = ["Well I don't like you much either!", "Hmph!"]
-    elif text.startswith('good morning') or text.startswith('goodmorning') or text.startswith('gm'):
+    elif text.startswith('good morning'):
         answers = ['Good morning']
-    elif ("im" in text or 'i am' in text) and not 'not' in text and ('tired' in text \
+    elif not 'not' in text and ('tired' in text \
         or 'exhausted' in text or 'sleepy' in text):
         answers = ['Ok, goodnight! ❤️', 'Go to bed then silly', 'Goodnight, sleepyhead!']
-    elif 'goodnight' in text or 'good night' in text or text.startswith('gn'):
+    elif 'good night' in text:
         answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!']
     else:
         #generic answers
