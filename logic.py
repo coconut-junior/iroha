@@ -5,6 +5,7 @@ import random
 import weather
 import nltk
 import ssl
+import json
 
 #update dictionary
 try:
@@ -118,43 +119,30 @@ def getAnswer(text, number):
         yelling = True
 
     text=text.lower()
-    #remove punctuation
-    text=text.replace("'", "")
-    text=text.replace('?', '')
-    text=text.replace('!', '')
-    #correct texting lingo
-    #also if text.endswith()
-    text=text.replace(' u ', ' you ')
-    text=text.replace(' dat ', ' that ')
-    text=text.replace(' wat ', ' what ')
-    text=text.replace('bc','because')
-    text=text.replace('nm', 'nothing much')
-    text=text.replace('wut','what')
-    text=text.replace('dont','do not')
-    text=text.replace('omw', 'on my way')
-    text=text.replace('whats', 'what is')
-    text=text.replace('hows', 'how is')
-    text=text.replace('pls', 'please')
-    text=text.replace('prolly', 'probably')
+    text = text.strip()
+    sentence = text.split(' ')
 
-    #because nobody gets the yours's right to hell with it
-    text=text.replace('your ', 'ur ')
-    text=text.replace("youre", 'ur')
+    with open ('word_corrections.json') as json_file:
+        data = json.load(json_file)
+        for key in data['punctuation'].keys():
+            text = text.replace(key, data['punctuation'][key])
+        for word in data['words'].keys():
+            for i in range(len(sentence)):
+                if sentence[i] == word:
+                    sentence[i] = data['words'][word]
+    
+    #convert array back to string
+    text = ''
+    for w in sentence:
+        text = text + w + ' '
+    text.strip()
+
     text=text.replace("you are",'ur')
-    text=text.replace('thankyou', 'thank you')
-    #remove filler words
-    if text.startswith('so '):
-        text=text.replace('so ', '')
-    if text.startswith('i '):
-        text=text.replace('i ', '')
 
     if 'please' in text or 'could you' in text or 'can you' in text:
         polite = True
         text=text.replace('please', '')
         text=text.replace('could you', '')
-
-    text = text.strip()
-    sentence = text.split(' ')
 
     #statement
     if text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):

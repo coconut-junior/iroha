@@ -1,0 +1,29 @@
+{
+    "punctuation": {
+        "'": "",
+        ".": "",
+        "?": "",
+        "!": "",
+        " u ": " you "
+    },
+    "words": {
+        "i": "",
+        "so": "",
+        "anyways": "",
+        "dat": "that",
+        "wat": "what",
+        "wut": "what",
+        "bc": "because",
+        "nm": "nothing much",
+        "dont": "do not",
+        "u": "you",
+        "omw": "on my way",
+        "whats": "what is",
+        "hows": "how is",
+        "pls": "please",
+        "prolly": "probably",
+        "your": "ur",
+        "youre": "ur",
+        "thankyou": "thank you"
+    }
+}
