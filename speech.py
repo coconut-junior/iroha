@@ -5,7 +5,6 @@ import weather
 import filters
 import random
 import time
-import speech_recognition as sr
 import requests, json
 
 owner = 'jimmy' #this can be changed with a transfer ownership command

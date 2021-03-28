@@ -3,14 +3,15 @@
         "'": "",
         ".": "",
         "?": "",
-        "!": "",
-        " u ": " you "
+        "!": ""
     },
     "words": {
         "i": "",
+        "u": "you",
         "im": "",
         "am": "",
         "so": "",
+        "most": "",
         "anyhow": "",
         "anyways": "",
         "seriously": "",
@@ -22,6 +23,7 @@
         "bc": "because",
         "nm": "nothing much",
         "dont": "do not",
+        "havent": "have not",
         "u": "you",
         "omw": "on my way",
         "whats": "what is",

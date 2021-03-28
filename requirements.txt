@@ -1,5 +1,5 @@
 pyglet
-Gets
+gtts
 python-vlc
 geopy
 ip2geotools
@@ -8,3 +8,4 @@ python-nmap
 requests
 geopy
 nltk
+twilio
