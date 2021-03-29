@@ -6,6 +6,7 @@ import weather
 import nltk
 import ssl
 import json
+import inflect
 
 #update dictionary
 try:
@@ -24,6 +25,10 @@ from nltk.corpus import wordnet
 #this will later be pulled from database
 bot_name = 'iroha'
 swear_words = []
+irregulars = []
+emotions = []
+current_emotion = 'calm'
+engine = inflect.engine()
 
 #load swear word list
 file1 = open('swear_words.txt','r')
@@ -105,16 +110,23 @@ def getAnt(word):
         return "hmm... i can't think of one, sorry"
 
 def likes(word):
+    global irregulars
     with open ('preferences.json') as json_file:
         data = json.load(json_file)
         l = data['likes']
         d = data['dislikes']
+
+        if not word in irregulars and not word.endswith('s'):
+            word = engine.plural(word)
+
         if word in l:
-            return 'yes i love them'
+            return ['i love ' + word, word + ' are my favorite!']
         elif word in d:
-            return 'no, i hate ' + word
+            return ['no, i hate ' + word, 
+            "i don't care much for " + word,
+            word + ' are literally the worst']
         else:
-            return 'honestly i feel pretty indifferent about ' + word
+            return ['honestly i feel pretty indifferent about ' + word]
 
 def getFavorite(word):
     with open ('preferences.json') as json_file:
@@ -133,6 +145,7 @@ def getDef(word):
 
 def getAnswer(text, number):
     global phonebook
+    global irregulars
     answer = ''
     answers = ['']
     img = ''
@@ -149,6 +162,7 @@ def getAnswer(text, number):
         text = text.strip()
         sentence = text.split(' ')
         data = json.load(json_file)
+        irregulars = data['irregulars']
         for word in data['words'].keys():
             for i in range(len(sentence)):
                 if sentence[i] == word:
@@ -175,7 +189,7 @@ def getAnswer(text, number):
     if text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
         answers = ['Heyyy', "Hey " + name, "What's up? 😊"]
     elif text.startswith('have not started'):
-        answers = ['better get to it!', "that's just lazy!"]
+        answers = ['better get to it!', "jeez you're lazy!"]
 
     #question
     elif isQuestion(text):
@@ -188,6 +202,13 @@ def getAnswer(text, number):
                 "meh... could be better"]
             else:
                 answers = ['fantastic!']
+
+        elif 'how about' in text and not 'we' in text:
+            try:
+                thing = sentence[sentence.index('about') + 1]
+                answers = likes(thing)
+            except:
+                answers = ['how about it?']
         elif text.startswith('what is') or text.startswith('what does') or text.startswith('do you'):
             if 'synonym' in text or 'another word' in text or 'equivalent' in text:
                 #find synonym
@@ -199,7 +220,7 @@ def getAnswer(text, number):
                 word = sent[len(sent) - 1]
                 answers = [getAnt(word)]
             elif 'ur name' in text:
-                answers = ["i'm " + bot_name]
+                answers = ["my name's " + bot_name]
             elif text == 'what is that':
                 answers = ['Your mom lol', "It's a chungus!"]
             elif 'ur favorite' in text:
@@ -217,7 +238,7 @@ def getAnswer(text, number):
             elif 'do you like' in text:
                 try:
                     thing = sentence[3]
-                    answers = [likes(thing)]
+                    answers = likes(thing)
                 except:
                     answers = ['like what?']
             else:
@@ -228,11 +249,19 @@ def getAnswer(text, number):
                         sent.remove('mean')
                     word = sent[len(sent) - 1]
                     answers = getDef(word)
-        elif text.startswith('are you'):
+            
+        elif 'are you' in text:
             if text.startswith('are you ' + bot_name):
                 answers = ['Well of course i am dummy', 'Pretty sure i am 🙄']
             elif 'bot' in text or 'machine' in text or 'an ai' in text or 'artificial' in text or 'computer' in text:
                 answers = ["i'm real, promise!", "why would you think that? i'm a person too"]
+            elif 'are you feeling' in text:
+                i = sentence.index('feeling')
+                if len(sentence) > i:
+                    if sentence[i + 1] == current_emotion:
+                        answers = ['actually, yea i am']
+                    else:
+                        answers = ["no, i feel really " + current_emotion + ' right now']
             else:
                 answers = ['I am most certainly not!','not at all','no lol who told you that']
         elif text.startswith('is your name'):
@@ -261,7 +290,7 @@ def getAnswer(text, number):
         elif 'miss you' in text:
             answers = ['i miss you too! it gets lonely having nobody to chat with']
         else:
-            answers = ["i'm not sure how to do that yet, sorry"]
+            answers = ["i'm not sure how to, sorry"]
 
     #uncategorized
     elif text.startswith('coming home') or text.startswith('on my way'):
@@ -269,15 +298,28 @@ def getAnswer(text, number):
     elif 'love you' in text:
         img = stamps.love
         answers = ['well... i love you too']
-    elif 'hate you' and not 'do not' in text:
+    elif 'hate you' in text and not 'do not' in text:
         answers = ["Well I don't like you much either!", "Hmph!"]
     elif text.startswith('good morning'):
         answers = ['Good morning']
     elif not 'not' in text and ('tired' in text \
         or 'exhausted' in text or 'sleepy' in text):
-        answers = ['Ok, goodnight! ❤️', 'Go to bed then silly', 'Goodnight, sleepyhead!']
-    elif 'good night' in text:
+        answers = ['Go to bed then silly', 'Goodnight, sleepyhead!']
+    if 'good night' in text or 'call it night' in text or 'done for tonight' in text:
         answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!']
+    elif 'bye' in text or 'got to go' in text:
+        answers = ['byeee', 'ok talk to you later 😋']
+    
+
+    #responses
+    elif text.startswith('okay'):
+        answers = ['']
+    elif text.startswith('no'):
+        answers = ['']
+    elif text.startswith('yes'):
+        answers = ['']
+    elif text.startswith('why'):
+        answers = ['']
     else:
         #generic answers
         answers = ['Hmmm', 'Huh', 'okaaay', 'if you say so']

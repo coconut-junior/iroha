@@ -2,12 +2,17 @@
 	"favorites": {
 		"color": "green",
 		"number": "9",
-		"artist": "demi lovato"
+		"artist": "demi lovato",
+		"song": "heart attack by demi lovato",
+		"food": "pizza"
 	},
 	"likes": [
-		"cats"
+		"cats",
+		"coffees"
 	],
 	"dislikes": [
-		"liars"
+		"liars",
+		"cheaters",
+		"manipulators"
 	]
 }
