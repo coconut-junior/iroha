@@ -7,7 +7,10 @@
     },
     "words": {
         "i": "",
+        "im": "",
+        "ill": "",
         "u": "you",
+        "ya": "you",
         "a": "",
         "an": "",
         "some": "",
@@ -15,9 +18,19 @@
         "am": "",
         "so": "",
         "the": "",
+        "just": "",
+        "think": "",
+        "brb": "be right back",
+        "cant": "cannot",
+        "didnt": "did not",
         "fine": "okay",
         "sure": "okay",
         "ok": "okay",
+        "ight": "okay",
+        "aight": "okay",
+        "ye": "yes",
+        "yee": "yes",
+        "yeee": "yes",
         "yea": "yes",
         "yeah": "yes",
         "yep": "yes",
@@ -32,6 +45,7 @@
         "anyhow": "",
         "anyways": "",
         "seriously": "",
+        "shutup": "shut up",
         "well": "",
         "dat": "that",
         "wat": "what",
@@ -55,7 +69,8 @@
         "goodmorning": "good morning",
         "gm": "good morning",
         "goodnight": "good night",
-        "gn": "good night"
+        "gn": "good night",
+        "thanks": "thank you"
     },
     "irregulars": [
 
