@@ -319,7 +319,7 @@ def getAnswer(text, number):
     #demand
     elif getType(sentence[0]) == 'v':
         if ('remind me' in text) or ('set' in text and 'reminder' in text):
-            answers = ['You can count on me!', 'Sure thing!']
+            answers = ['You can count on me!', "sure, i'll make sure you remember!"]
             automation.createReminder(text) #only use for testing on local machine
             #sendCmd('remind:' + text, number)
         elif 'shut up' in text or 'be quiet' in text:

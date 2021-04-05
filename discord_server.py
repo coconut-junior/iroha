@@ -8,9 +8,11 @@ from datetime import datetime
 from datetime import date
 import json
 import random
+from dateutil.easter import *
 
-event_easter = '2021-04-04'#24hrs
-msg_easter = 'the time has come!'
+msg_newyear = 'Happy new year! 🥳🥂'
+msg_easter = 'Happy easter! 🐰'
+msg_christmas = 'Merry Christmas! 🎄'
 known_channels = [] #we will keep these anonymous for now
 wake_time = "9" + ":" + str(random.randint(0,30))
 
@@ -26,9 +28,18 @@ class MyClient(discord.Client):
 
         while True:
             t = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+            msg = None
 
-            if str(date.today()) == event_easter and t == wake_time:
-                #message everyone iroha knows
+            #holiday events
+            if date.today().month == 1 and date.today().day == 1 and t == '0:0'
+                msg = msg_newyear
+            if str(date.today()) == easter(date.today().year) and t == wake_time:
+                msg = msg_easter
+            if date.today().month == 12 and date.today().day == 25 and t == wake_time:
+                msg = msg_christmas
+
+            #message everyone iroha knows
+            if not msg == None:
                 for c in known_channels:
                     channel = client.get_channel(c)
                     await channel.send(msg_easter)
