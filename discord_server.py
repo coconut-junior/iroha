@@ -31,7 +31,7 @@ class MyClient(discord.Client):
             msg = None
 
             #holiday events
-            if date.today().month == 1 and date.today().day == 1 and t == '0:0'
+            if date.today().month == 1 and date.today().day == 1 and t == '0:0':
                 msg = msg_newyear
             if str(date.today()) == easter(date.today().year) and t == wake_time:
                 msg = msg_easter

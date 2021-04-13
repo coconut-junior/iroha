@@ -11,3 +11,4 @@ nltk
 twilio
 inflect
 python-dateutil
+discord.py

@@ -50,6 +50,7 @@ for word in words:
 phonebook = {}
 phonebook['+14843928694'] = 'John'
 phonebook['+14843021063'] = 'Jimmy'
+last_answer = ''
 
 def sendCmd(cmd, number):
     import smtplib
@@ -165,6 +166,7 @@ def getDef(word):
 def getAnswer(text, number):
     global phonebook
     global irregulars
+    global last_answer
     answer = ''
     answers = ['']
     img = ''
@@ -216,6 +218,8 @@ def getAnswer(text, number):
     #statement
     if text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
         answers = ['Heyyy', "Hey " + name, "What's up? 😊"]
+    elif 'you cannot' in text or 'no way you can' in text:
+        answers = ['actually, i can thank you very much', "you'd be surprised haha", 'come on have some faith in me!']
     elif text.startswith('have not started'):
         answers = ['better get to it!', "jeez you're lazy!"]
 
@@ -256,6 +260,8 @@ def getAnswer(text, number):
                 answers = [getAnt(word)]
             elif 'ur name' in text:
                 answers = ["my name's " + bot_name]
+            elif 'up' in sentence:
+                answers = ['the sky, of course! :)']
             elif text == 'what is that':
                 answers = ['Your mom lol', "It's a chungus!"]
             elif 'ur favorite' in text:
@@ -367,20 +373,18 @@ def getAnswer(text, number):
         or 'exhausted' in text or 'sleepy' in text):
         answers = ['Go to bed then silly', 'is it naptime?']
     elif 'good night' in text or 'going to bed' in text or 'go to bed' in text or 'call it night' in text or 'done for tonight' in text:
-        answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!']
+        answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!', 'would you like a goodnight kiss?']
     elif 'bye' in text or 'got to go' in text:
         answers = ['byeee', 'ok talk to you later 😋']
     
-        
-    
 
     #responses
-    elif text.startswith('okay'):
-        answers = ['yup!','mhm']
     elif text.startswith('no'):
         answers = ["that makes sense", "didn't think so...", "yea i figured"]
-    elif text.startswith('yes'):
+    elif 'yes' in sentence or 'okay' in sentence:
         answers = ['i thought so haha']
+        if last_answer == 'would you like a goodnight kiss?':
+            answers = ['*kisses you*']
     elif text.startswith('why'):
         answers = ['i dunno', "i'm not sure"]
     else:
@@ -389,10 +393,8 @@ def getAnswer(text, number):
 
     if answers == ['']:
         answers = generic
-
     if yelling and not 'omg' in text and not 'lol' in text and not 'haha' in text and not 'yes' in text:
         answers = ['WHY ARE YOU YELLING',"stop yelling you're scaring me"]
-
     if any(element in sentence for element in swear_words):
         answers = ["curse at me one more time and i'll slap you", 'swearing is bad']
     
@@ -403,4 +405,5 @@ def getAnswer(text, number):
     else:
         answer = ''
     print("sending '" + answer + "' to " + name)
+    last_answer = answer
     return [answer, img]
