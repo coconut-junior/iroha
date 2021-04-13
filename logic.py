@@ -216,8 +216,12 @@ def getAnswer(text, number):
     sentence = text.split(' ')
 
     #statement
-    if text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
+    if text == 'exit' or text == 'quit':
+        answers = ['shutting down...']
+    elif text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
         answers = ['Heyyy', "Hey " + name, "What's up? 😊"]
+    elif 'going to' in text and not 'bed' in text and not 'sleep' in text:
+        answers = ["good luck! i'll be here if you need me"]
     elif 'you cannot' in text or 'no way you can' in text:
         answers = ['actually, i can thank you very much', "you'd be surprised haha", 'come on have some faith in me!']
     elif text.startswith('have not started'):

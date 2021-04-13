@@ -20,16 +20,12 @@ def getIP():
 
 #get location from ip
 getIP()
-print(ip)
+print('obtaining weather data...')
 response = DbIpCity.get(str(ip), api_key='free')
 geolocator = Nominatim(user_agent="Your_Name")
 location = geolocator.geocode('response.city'.split(' ')[0])
 latitude = str(location.latitude)
 longitude = str(location.longitude)
-
-print('approximate latitude is ' + latitude)
-print('approximate longitude is ' + longitude)
-
 
 BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
 API_KEY = '00f6e237960715dec93a4b29fec1ec9c'

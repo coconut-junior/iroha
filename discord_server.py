@@ -19,12 +19,17 @@ wake_time = "9" + ":" + str(random.randint(0,30))
 class MyClient(discord.Client):
 
     async def on_ready(self):
-        print('Logged in as')
-        print(client.user.name)
-        print(client.user.id)
+        with  open('startup.txt', 'r') as f:
+            contents = f.read()
+            print(contents)
+            print('')
+        
+        print('login successful')
+        print('client name: ' + client.user.name)
+        print('client id: ' + str(client.user.id))
         print('------')
-        print('wake time is set to ' + wake_time)
         print('current date is ' + str(date.today()))
+        print('wake time is set to ' + wake_time)
 
         while True:
             t = str(datetime.now().hour) + ":" + str(datetime.now().minute)
