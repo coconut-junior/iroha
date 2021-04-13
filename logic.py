@@ -163,7 +163,7 @@ def getDef(word):
     except:
         return ["I'm really not sure", 'beats me']
 
-def getAnswer(text, number):
+def getAnswer(text, number, channel):
     global phonebook
     global irregulars
     global last_answer
@@ -330,7 +330,7 @@ def getAnswer(text, number):
     elif getType(sentence[0]) == 'v':
         if ('remind me' in text) or ('set' in text and 'reminder' in text):
             answers = ['You can count on me!', "sure, i'll make sure you remember!"]
-            automation.createReminder(text) #only use for testing on local machine
+            automation.createReminder(text, channel) #only use for testing on local machine
             #sendCmd('remind:' + text, number)
         elif 'shut up' in text or 'be quiet' in text:
             answers = ["got it... I won't speak unless spoken to","have you got any manners?? i'll be quiet though"]
@@ -377,7 +377,7 @@ def getAnswer(text, number):
         or 'exhausted' in text or 'sleepy' in text):
         answers = ['Go to bed then silly', 'is it naptime?']
     elif 'good night' in text or 'going to bed' in text or 'go to bed' in text or 'call it night' in text or 'done for tonight' in text:
-        answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!', 'would you like a goodnight kiss?']
+        answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!', 'would you like a goodnight kiss?', 'sweet dreams ' + name + ' ❤️']
     elif 'bye' in text or 'got to go' in text:
         answers = ['byeee', 'ok talk to you later 😋']
     

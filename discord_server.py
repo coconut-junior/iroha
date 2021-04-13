@@ -16,6 +16,9 @@ msg_christmas = 'Merry Christmas! 🎄'
 known_channels = [] #we will keep these anonymous for now
 wake_time = "9" + ":" + str(random.randint(0,30))
 
+
+#fix reminders!
+
 class MyClient(discord.Client):
 
     async def on_ready(self):
@@ -43,11 +46,18 @@ class MyClient(discord.Client):
             if date.today().month == 12 and date.today().day == 25 and t == wake_time:
                 msg = msg_christmas
 
+            for r in automation.reminders:
+                if str(date.today()) == r['date'] and t == r['time']:
+                    print('sending reminder')
+                    m = r['message']
+                    channel = client.get_channel(r['channel'])
+                    await channel.send("hey looks like it's time to " + m)
+
             #message everyone iroha knows
             if not msg == None:
                 for c in known_channels:
                     channel = client.get_channel(c)
-                    await channel.send(msg_easter)
+                    await channel.send(msg)
             #operate once a minute
             await asyncio.sleep(60)
 
@@ -57,7 +67,7 @@ class MyClient(discord.Client):
         if message.author == self.user:
             return
 
-        answer = logic.getAnswer(message.content, automation.phone_number)
+        answer = logic.getAnswer(message.content, automation.phone_number, message.channel.id)
         if not answer[1] == '':
             with open(answer[1], 'rb') as f:
                 picture = discord.File(f)

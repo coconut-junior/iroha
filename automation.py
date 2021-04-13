@@ -72,7 +72,7 @@ def add_years(d, years):
             return d.replace(year=new_year, day=28)
         raise
 
-def createReminder(text):
+def createReminder(text, channel):
     numbers = [':','0','1','2','3','4','5','6','7','8','9']
     print('setting reminder...')
 
@@ -109,11 +109,12 @@ def createReminder(text):
         if 'morning' in text:
             text = text.replace('morning','')
             text = text[:i] + 'am' + text[i:]
-        elif 'night' in text:
+        elif 'night' in text or 'evening' in text:
             text = text.replace('night', '')
+            text = text.replace('evening', '')
             text = text[:i] + 'pm' + text[i:]
         else:
-            text = text[:i] + 'am' + text[i:]
+            text = text[:i] + 'pm' + text[i:]
 
     for t in times:
         try:
@@ -171,13 +172,17 @@ def createReminder(text):
 
     if not hr == 0:
         msg = msg.strip()
+        if 'my' in msg:
+            msg = msg.replace('my','your')
+        else:
+            msg = msg.replace('your', 'my')
         print('reminder set for ' + str(target_date) + ' at ' + str(hr)+':'+str(mn))
 
         r = {}
         r['date'] = str(target_date)
-        r['hour'] = hr
-        r['minute'] = mn
+        r['time'] = str(hr) + ':' + str(mn)
         r['message'] = msg
+        r['channel'] = channel
         reminders.append(r)
 
 def sendSMS(message, number):
