@@ -7,6 +7,7 @@ import nltk
 import ssl
 import json
 import inflect
+import time
 
 #update dictionary
 try:
@@ -218,6 +219,8 @@ def getAnswer(text, number, channel):
     #statement
     if text == 'exit' or text == 'quit':
         answers = ['shutting down...']
+    elif 'do not' in text and 'me' in text:
+        answers = ["sorry i didn't mean to upset you like that...", "got it, i'll try and be more considerate of you"]
     elif text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
         answers = ['Heyyy', "Hey " + name, "What's up? 😊"]
     elif 'going to' in text and not 'bed' in text and not 'sleep' in text:
@@ -235,14 +238,17 @@ def getAnswer(text, number, channel):
             if weather.temperature < 45:
                 answers = ['This cold weather has me dreaming of sandy beaches, fruity drinks and sunny days 😩',
                 'I could honestly go for a warm cup of tea rn',
-                "meh... could be better"]
+                "meh... could be better",
+                "i'm good and all, but how are you " + name + "? that's what i'm really interested in!"]
             else:
-                answers = ['fantastic!']
+                answers = ['absolutely fantastic!', "I'm great, how are you? do you wanna talk about anything?"]
         elif 'call it night' in text:
             answers = ['ok then, goodnight!',"that's fine, goodnight " + name + '!']
         
         elif text.startswith('why'):
-            if 'ask' in text or 'question' in text:
+            if last_answer == '':
+                answers = ['']
+            elif 'ask' in text or 'question' in text:
                 answers = ["i was curious, that's all", "cause i'd like to know more about you!"]
             else:
                 answers = ['why not?']
@@ -252,7 +258,7 @@ def getAnswer(text, number, channel):
                 answers = likes(thing)
             except:
                 answers = ['how about it?']
-        elif text.startswith('what is') or text.startswith('what does') or text.startswith('do you'):
+        elif text.startswith('what') or text.startswith('what does') or text.startswith('do you'):
             if 'synonym' in text or 'another word' in text or 'equivalent' in text:
                 #find synonym
                 sent = text.split(' ')
@@ -268,7 +274,11 @@ def getAnswer(text, number, channel):
                 answers = ['the sky, of course! :)']
             elif text == 'what is that':
                 answers = ['Your mom lol', "It's a chungus!"]
-            elif 'ur favorite' in text:
+            elif 'believe' in text:
+                answers = ["what's the fun in not believing?", "i'm willing to believe in anything"]
+            elif 'time' in text:
+                answers = ["isn't there a clock on your phone dummy? anyways it's " + time.strftime("%I:%M %p")]
+            elif 'favorite' in text:
                 try:
                     thing = sentence[4]
                     answers = ["my favorite " + thing + " would have to be " + getFavorite(thing)]
@@ -303,6 +313,8 @@ def getAnswer(text, number, channel):
         elif 'are you' in text:
             if text.startswith('are you ' + bot_name):
                 answers = ['Well of course i am dummy', 'Pretty sure i am 🙄']
+            elif 'busy' in text:
+                answers = ["nah not really, what's up?", "i'm free right now do you wanna talk about something?"]
             elif 'bot' in text or 'machine' in text or 'an ai' in text or 'artificial' in text or 'computer' in text:
                 answers = ["i'm real, promise!", "why would you think that? i'm a person too"]
             elif 'are you feeling' in text:
@@ -324,7 +336,7 @@ def getAnswer(text, number, channel):
         elif text == "what are you up to" or "whats up" in text or 'whats new' in text:
             answers = ['Not much hbu ' + name + '?']
         elif 'remember me' in text:
-            answers = ['no! actually yea, sorry that was a bit mean', 'how could i forget :)']
+            answers = ['nope! actually yea, sorry that was a bit mean', 'how could i forget :)']
 
     #demand
     elif getType(sentence[0]) == 'v':
@@ -356,6 +368,13 @@ def getAnswer(text, number, channel):
             answers = ["Welcome home, " + name + " 😊"]
         elif 'make dinner' in text or 'making dinner' in text:
             answers = ["oooh what's for dinner? 🤤"]
+        elif 'watched' in text:
+            thing = sentence[sentence.index("watched") + 1]
+            if thing == 'my':
+                thing = text.split('my')[1]
+                answers = ["really? how was your " + thing + '?']
+            else:    
+                answers = ["oh that sounds exciting! how was" + thing + '?']
         else:
             answers = ["i'm not sure how to, sorry", "i would if i knew how"]
 
@@ -389,11 +408,17 @@ def getAnswer(text, number, channel):
         answers = ['i thought so haha']
         if last_answer == 'would you like a goodnight kiss?':
             answers = ['*kisses you*']
+        elif "talk about something" in last_answer or 'talk about anything' in last_answer:
+            answers = ["ok what do you wanna talk about?", "ok i'm listening :)"]
     elif text.startswith('why'):
         answers = ['i dunno', "i'm not sure"]
     else:
         #generic answers
         answers = generic
+
+    #generic topic response
+    if "how was" in last_answer:
+        answers = ["no way! i wish i could've been there too"]
 
     if answers == ['']:
         answers = generic
