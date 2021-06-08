@@ -22,6 +22,17 @@ morning_min = random.randint(0,30)
 morning_greetings = ['Good morning ' + speech.owner + ' did u sleep well?', 
 'Sleep well, ' + speech.owner + '?', 'Rise and shine ' + speech.owner + ' ☺️']
 
+def getUptime():
+    global uptime
+    if uptime < 1:
+        return "less than a minute"
+    elif uptime == 1:
+        return "about a minute"
+    elif uptime >1 and uptime <60:
+        return str(uptime) + " minutes"
+    else:
+        return str(uptime/60) + " hours"
+
 def execute(task):
     if task == 'laugh':
         print('hahahahahahahaHAHAHAH')

@@ -60,6 +60,7 @@ class MyClient(discord.Client):
                     await channel.send(msg)
             #operate once a minute
             await asyncio.sleep(60)
+            automation.uptime += 1
 
     async def on_message(self, message):
         global known_channels

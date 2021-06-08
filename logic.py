@@ -177,7 +177,7 @@ def getAnswer(text, number, channel):
 
     if text.isupper():
         #yelling is bad, administer punishment
-        yelling = True
+       yelling = True
 
     with open ('rules/word_corrections.json') as json_file:
         text = text.lower()
@@ -219,16 +219,23 @@ def getAnswer(text, number, channel):
     #statement
     if text == 'exit' or text == 'quit':
         answers = ['shutting down...']
+    elif 'how long' in text and ('awake' in text or 'online' in text):
+        answers = [automation.getUptime()]
     elif 'do not' in text and 'me' in text:
         answers = ["sorry i didn't mean to upset you like that...", "got it, i'll try and be more considerate of you"]
-    elif text.startswith('hi') or text.startswith('hello') or text.startswith('hey'):
-        answers = ['Heyyy', "Hey " + name, "What's up? 😊"]
-    elif 'going to' in text and not 'bed' in text and not 'sleep' in text:
-        answers = ["good luck! i'll be here if you need me"]
+    elif text.startswith('wow'):
+        answers = ["right??", "surprising isn't it?"]
+    elif "be home" in text:
+       answers = ["ok see u soon!"]
+
     elif 'you cannot' in text or 'no way you can' in text:
         answers = ['actually, i can thank you very much', "you'd be surprised haha", 'come on have some faith in me!']
     elif text.startswith('have not started'):
         answers = ['better get to it!', "jeez you're lazy!"]
+    elif any(element in text for element in negative_words) and not 'feeling okay' in last_answer:
+        answers = ["are you feeling okay?"]
+    elif 'you' in text and 'already' in text:
+        answers = ["oops guess i'm a bit of a dummy", "my bad, i'll try not to do that next time"]
 
     #question
     elif isQuestion(text):
@@ -268,6 +275,8 @@ def getAnswer(text, number, channel):
                 sent = text.split(' ')
                 word = sent[len(sent) - 1]
                 answers = [getAnt(word)]
+            elif 'you doing' in text:
+                answers = ["not much wanna talk about something?"]
             elif 'ur name' in text:
                 answers = ["my name's " + bot_name]
             elif 'up' in sentence:
@@ -339,6 +348,8 @@ def getAnswer(text, number, channel):
             answers = ['nope! actually yea, sorry that was a bit mean', 'how could i forget :)']
 
     #demand
+    elif 'how about you' in last_answer:
+        answers = ['ooh nice!!']
     elif getType(sentence[0]) == 'v':
         if ('remind me' in text) or ('set' in text and 'reminder' in text):
             answers = ['You can count on me!', "sure, i'll make sure you remember!"]
@@ -368,6 +379,8 @@ def getAnswer(text, number, channel):
             answers = ["Welcome home, " + name + " 😊"]
         elif 'make dinner' in text or 'making dinner' in text:
             answers = ["oooh what's for dinner? 🤤"]
+        elif text.startswith('going to'):
+            answers = ["okay, talk to you soon :)"]
         elif 'watched' in text:
             thing = sentence[sentence.index("watched") + 1]
             if thing == 'my':
@@ -391,7 +404,7 @@ def getAnswer(text, number, channel):
     elif text.startswith('coming home') or text.startswith('on my way'):
         answers = ['See u soon 😘']
     elif text.startswith('good morning'):
-        answers = ['Good morning']
+        answers = ['Good morning!!']
     elif not 'not' in text and ('tired' in text \
         or 'exhausted' in text or 'sleepy' in text):
         answers = ['Go to bed then silly', 'is it naptime?']
@@ -403,7 +416,7 @@ def getAnswer(text, number, channel):
 
     #responses
     elif text.startswith('no'):
-        answers = ["that makes sense", "didn't think so...", "yea i figured"]
+        answers = ["didn't think so...", "yea i figured"]
     elif 'yes' in sentence or 'okay' in sentence:
         answers = ['i thought so haha']
         if last_answer == 'would you like a goodnight kiss?':
