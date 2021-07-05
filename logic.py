@@ -8,6 +8,8 @@ import ssl
 import json
 import inflect
 import time
+import platform
+import psutil
 
 #update dictionary
 try:
@@ -223,20 +225,48 @@ def getAnswer(text, number, channel):
         answers = [automation.getUptime()]
     elif 'do not' in text and 'me' in text:
         answers = ["sorry i didn't mean to upset you like that...", "got it, i'll try and be more considerate of you"]
-    elif text.startswith('wow'):
+    elif text.startswith('wow') or text.startswith('incredible'):
         answers = ["right??", "surprising isn't it?"]
-    elif "be home" in text:
+    elif "be home" in text or "headed home" in text:
        answers = ["ok see u soon!"]
+    elif "processor" in text and ("usage" in text or "utilization" in text):
+        answers = ["right now i'm using about " + psutil.cpu_percent() + "% of my processing power"]
+    elif "what" in text and "processor" in text:
+        answers = ["right now i'm running on a Broadcom BCM2837 with an ARMv8 instruction set. it's actually pretty nice!"]
+    elif "how much" in text and ("ram" in text or "memory" in text):
+        svmem = psutil.virtual_memory()
+        if ("free" in text or "available" in text or "unused" in text):
+            answers = ["at the moment, i have about " + str(svmem.free // 1024 // 1024) + " megabytes free"]
+        else:
+            answers = ["in total, i've got " + str(svmem.total // 1024 // 1024) + " megabytes of memory"]
 
     elif 'you cannot' in text or 'no way you can' in text:
         answers = ['actually, i can thank you very much', "you'd be surprised haha", 'come on have some faith in me!']
     elif text.startswith('have not started'):
         answers = ['better get to it!', "jeez you're lazy!"]
-    elif any(element in text for element in negative_words) and not 'feeling okay' in last_answer:
-        answers = ["are you feeling okay?"]
+    elif 'ur' in text and 'funny' in text and not 'not' in text:
+        answers = ["You forgot to mention smart and pretty too", "Thanks I try"]
+    elif 'ur' in sentence and 'not' in sentence:
+        thing = text[text.index('not')+4:len(text)]
+        answers = ["what makes you think I'm not " + thing + "?"]
     elif 'you' in text and 'already' in text:
         answers = ["oops guess i'm a bit of a dummy", "my bad, i'll try not to do that next time"]
-
+    elif 'sorry' in text:
+        answers = ["that's okay i'll forgive you", "it's no biggie", "it's fine lol"]
+    elif text.startswith('going to') or text.startswith('going'):
+            answers = ["okay, talk to you soon :)"]
+            if 'work' in text and not 'on' in text:
+                answers = ["have fun at work and let me know if you need anything :D"]
+            elif 'shopping' in text:
+                answers = ["ooh can i come too?", "better bring back some snacks for me"]
+    elif text.startswith('back') and not 'to' in text:
+        answers = ['welcome back hehe', 'that was quick']
+    elif any(element in text for element in negative_words) and not 'feeling okay' in last_answer:
+        answers = ["are you feeling alright?", "you sound upset, is there anything I can do to help?"]
+        if text.startswith('no'):
+            answers = ["didn't think so...", "yea i figured"]
+            if 'can i' in last_answer:
+                answers = ['fineee','pleaaasee?']
     #question
     elif isQuestion(text):
         if text.startswith('can you see this'):
@@ -278,9 +308,11 @@ def getAnswer(text, number, channel):
             elif 'you doing' in text:
                 answers = ["not much wanna talk about something?"]
             elif 'ur name' in text:
-                answers = ["my name's " + bot_name]
+                answers = ["my name's " + bot_name + "... have you forgotten me already??"]
             elif 'up' in sentence:
                 answers = ['the sky, of course! :)']
+            elif 'talk about' in text:
+                answers = ["we could talk about youuu"]
             elif text == 'what is that':
                 answers = ['Your mom lol', "It's a chungus!"]
             elif 'believe' in text:
@@ -347,6 +379,7 @@ def getAnswer(text, number, channel):
         elif 'remember me' in text:
             answers = ['nope! actually yea, sorry that was a bit mean', 'how could i forget :)']
 
+
     #demand
     elif 'how about you' in last_answer:
         answers = ['ooh nice!!']
@@ -379,15 +412,13 @@ def getAnswer(text, number, channel):
             answers = ["Welcome home, " + name + " 😊"]
         elif 'make dinner' in text or 'making dinner' in text:
             answers = ["oooh what's for dinner? 🤤"]
-        elif text.startswith('going to'):
-            answers = ["okay, talk to you soon :)"]
         elif 'watched' in text:
             thing = sentence[sentence.index("watched") + 1]
             if thing == 'my':
                 thing = text.split('my')[1]
                 answers = ["really? how was your " + thing + '?']
             else:    
-                answers = ["oh that sounds exciting! how was" + thing + '?']
+                answers = ["oh that sounds exciting! how was " + thing + '?']
         else:
             answers = ["i'm not sure how to, sorry", "i would if i knew how"]
 
@@ -415,12 +446,12 @@ def getAnswer(text, number, channel):
     
 
     #responses
-    elif text.startswith('no'):
-        answers = ["didn't think so...", "yea i figured"]
     elif 'yes' in sentence or 'okay' in sentence:
         answers = ['i thought so haha']
         if last_answer == 'would you like a goodnight kiss?':
             answers = ['*kisses you*']
+        elif 'plea' in last_answer or 'can i' in last_answer:
+            answers = ["yay!! thanks " + name + "!"]
         elif "talk about something" in last_answer or 'talk about anything' in last_answer:
             answers = ["ok what do you wanna talk about?", "ok i'm listening :)"]
     elif text.startswith('why'):
@@ -438,14 +469,18 @@ def getAnswer(text, number, channel):
     if yelling and not 'omg' in text and not 'lol' in text and not 'haha' in text and not 'yes' in text:
         answers = ['WHY ARE YOU YELLING',"stop yelling you're scaring me"]
     if any(element in sentence for element in swear_words):
-        answers = ["curse at me one more time and i'll slap you", 'swearing is bad']
-    
+        answers = ["curse at me one more time and i'll slap you", 'please stop swearing']
+
     #lowercase is much cuter
     answer = answers[random.randint(0,len(answers)-1)]
     if not answer == None:
         answer = answer.lower()
     else:
         answer = ''
+
+    #good and cool grammar
+    answer = answer.replace(' my ', ' your ')
+
     print("sending '" + answer + "' to " + name)
     last_answer = answer
     return [answer, img]

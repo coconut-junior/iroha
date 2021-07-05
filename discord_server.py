@@ -15,13 +15,16 @@ msg_easter = 'Happy easter! 🐰'
 msg_christmas = 'Merry Christmas! 🎄'
 known_channels = [] #we will keep these anonymous for now
 wake_time = "9" + ":" + str(random.randint(0,30))
-
+last_answer = ""
+wait_time = 0
 
 #fix reminders!
 
 class MyClient(discord.Client):
 
     async def on_ready(self):
+        global last_answer
+        global wait_time
         with  open('startup.txt', 'r') as f:
             contents = f.read()
             print(contents)
@@ -53,6 +56,10 @@ class MyClient(discord.Client):
                     channel = client.get_channel(r['channel'])
                     await channel.send("hey looks like it's time to " + m)
 
+            if wait_time == 2:
+                annoyed_msg = ["so are you gonna answer me or what lol", "heyyy i asked you a question silly"]
+                msg = annoyed_msg[random.randint(0,len(annoyed_msg)-1)]
+
             #message everyone iroha knows
             if not msg == None:
                 for c in known_channels:
@@ -61,9 +68,13 @@ class MyClient(discord.Client):
             #operate once a minute
             await asyncio.sleep(60)
             automation.uptime += 1
+            if '?' in last_answer:
+                wait_time += 1
 
     async def on_message(self, message):
         global known_channels
+        global last_answer
+        global wait_time
         # don't respond to ourselves
         if message.author == self.user:
             return
@@ -78,7 +89,9 @@ class MyClient(discord.Client):
             known_channels.append(message.channel.id)
             print('adding channel ' + str(message.channel.id))
 
-        await message.channel.send(answer[0])
+        last_answer = answer[0]
+        wait_time = 0
+        await message.channel.send(last_answer)
 
 client = MyClient()
 client.run('ODI2MTQxMjA2MDY1MDUzNzI3.YGIJ9A.5jYJ7v6JYFQgXoAxOFYK5MBy4Ag')

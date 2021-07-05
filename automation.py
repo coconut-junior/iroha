@@ -22,6 +22,12 @@ morning_min = random.randint(0,30)
 morning_greetings = ['Good morning ' + speech.owner + ' did u sleep well?', 
 'Sleep well, ' + speech.owner + '?', 'Rise and shine ' + speech.owner + ' ☺️']
 
+#still looking for a good api
+def getPics(term):
+    j = requests.get("https://serpapi.com/search.json?q=" + term + "&tbm=isch&ijn=0&api_key=" + serpapi_key)
+    j_data = j.data()
+
+
 def getUptime():
     global uptime
     if uptime < 1:
