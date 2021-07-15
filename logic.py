@@ -77,8 +77,12 @@ def sendCmd(cmd, number):
 def isQuestion(text):
     if text.startswith('how') or text.startswith('do') \
     or text.startswith('what') or text.startswith('where')\
-    or text.startswith('who') or text.startswith('when')\
-    or text.startswith('why') or text.startswith('how') or text.startswith('are') or text.startswith('is'):
+    or text.startswith('who') or 'who is' in text or 'who do' in text\
+    or text.startswith('when')\
+    or text.startswith('why') or text.startswith('how')\
+    or text.startswith('are') or text.startswith('is')\
+    or text.startswith('can') or text.startswith('may')\
+    or text.startswith('would') or text.startswith('could'):
         return True
     else:
         return False
@@ -239,7 +243,8 @@ def getAnswer(text, number, channel):
             answers = ["at the moment, i have about " + str(svmem.free // 1024 // 1024) + " megabytes free"]
         else:
             answers = ["in total, i've got " + str(svmem.total // 1024 // 1024) + " megabytes of memory"]
-
+    elif 'you knew' in text:
+        answers = ["of course I knew, i care a lot about you", "i may not know everything, but i knew that much"]
     elif 'you cannot' in text or 'no way you can' in text:
         answers = ['actually, i can thank you very much', "you'd be surprised haha", 'come on have some faith in me!']
     elif text.startswith('have not started'):
@@ -251,7 +256,7 @@ def getAnswer(text, number, channel):
         answers = ["what makes you think I'm not " + thing + "?"]
     elif 'you' in text and 'already' in text:
         answers = ["oops guess i'm a bit of a dummy", "my bad, i'll try not to do that next time"]
-    elif 'sorry' in text:
+    elif 'sorry' in text or 'forgive me' in text:
         answers = ["that's okay i'll forgive you", "it's no biggie", "it's fine lol"]
     elif text.startswith('going to') or text.startswith('going'):
             answers = ["okay, talk to you soon :)"]
@@ -261,22 +266,34 @@ def getAnswer(text, number, channel):
                 answers = ["ooh can i come too?", "better bring back some snacks for me"]
     elif text.startswith('back') and not 'to' in text:
         answers = ['welcome back hehe', 'that was quick']
-    elif any(element in text for element in negative_words) and not 'feeling okay' in last_answer:
-        answers = ["are you feeling alright?", "you sound upset, is there anything I can do to help?"]
-        if text.startswith('no'):
-            answers = ["didn't think so...", "yea i figured"]
-            if 'can i' in last_answer:
-                answers = ['fineee','pleaaasee?']
+    elif 'you sure' in text:
+        answers = ["haha i'm positive 😉"]
+
     #question
     elif isQuestion(text):
-        if text.startswith('can you see this'):
+        if 'how many' in text:
+            answers = ["well... i would have to count haha"]
+        elif 'would you' in text or 'could you' in text:
+            if isNegative(sentence):
+                answers = ['nooo that sounds terrible!']
+            else:
+                answers = ['sure i could!']
+        elif 'who do you love' in text or 'who do you like' in text:
+            answers = ['you of course and nobody else 😉']
+        elif text.startswith('can you see'):
             answers = ['Yes i can! 😁', "are you suggesting i'm blind?", 'of course i can']
+        elif (sentence[0] == "can" or sentence[0] == "may" or 'let me' in text or 'allow me' in text) and sentence[1] != "you":
+            answers = ["Go ahead :)", "Sure why not"]
+            if 'ask' in text:
+                answers = ["ask away, I'm listening 😊", "you can ask me anything " + name + "😊"]
         elif 'how are you' in text or 'how is it' in text:
             if weather.temperature < 45:
                 answers = ['This cold weather has me dreaming of sandy beaches, fruity drinks and sunny days 😩',
                 'I could honestly go for a warm cup of tea rn',
                 "meh... could be better",
                 "i'm good and all, but how are you " + name + "? that's what i'm really interested in!"]
+            elif weather.temperature > 75:
+                answers = ["i just wish it wasn't sooo hot today 😓"]
             else:
                 answers = ['absolutely fantastic!', "I'm great, how are you? do you wanna talk about anything?"]
         elif 'call it night' in text:
@@ -443,6 +460,13 @@ def getAnswer(text, number, channel):
         answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!', 'would you like a goodnight kiss?', 'sweet dreams ' + name + ' ❤️']
     elif 'bye' in text or 'got to go' in text:
         answers = ['byeee', 'ok talk to you later 😋']
+    elif any(element in text for element in negative_words) and not 'feeling okay' in last_answer:
+        answers = ["are you feeling alright?", "you sound upset, is there anything I can do to make you feel better?"]
+        if text.startswith('no'):
+            answers = ["didn't think so...", "yea i figured"]
+            if 'can i' in last_answer:
+                answers = ['fineee','pleaaasee?']
+
     
 
     #responses
