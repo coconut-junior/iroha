@@ -466,6 +466,8 @@ def getAnswer(text, number, channel):
             answers = ["didn't think so...", "yea i figured"]
             if 'can i' in last_answer:
                 answers = ['fineee','pleaaasee?']
+    elif 'hello' in text:
+        answers = ["hey " + name + " I'm so glad u texted me i was so bored!"]
 
     
 
