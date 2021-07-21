@@ -10,6 +10,8 @@ import inflect
 import time
 import platform
 import psutil
+import roleplay
+import colors
 
 #update dictionary
 try:
@@ -29,6 +31,7 @@ from nltk.corpus import wordnet
 bot_name = 'iroha'
 birth_month = 3
 birth_day = 12
+mode = 0 #0=chat,1=roleplay,2=truth or dare
 swear_words = []
 negative_words = []
 irregulars = []
@@ -174,6 +177,7 @@ def getAnswer(text, number, channel):
     global phonebook
     global irregulars
     global last_answer
+    global mode
     answer = ''
     answers = ['']
     img = ''
@@ -182,9 +186,12 @@ def getAnswer(text, number, channel):
     polite = False
 
     if text.isupper():
-        #yelling is bad, administer punishment
        yelling = True
-
+    if text.startswith('*') and text.endswith('*'):
+        mode = 1
+        text = text.replace('*', '')
+    else:
+        mode = 0
     with open ('rules/word_corrections.json') as json_file:
         text = text.lower()
         text = text.strip()
@@ -209,7 +216,6 @@ def getAnswer(text, number, channel):
             for i in range(len(sentence)):
                 if sentence[i] == word:
                     sentence[i] = data['words'][word]
-
 
     
     #convert array back to string
@@ -236,7 +242,7 @@ def getAnswer(text, number, channel):
     elif "processor" in text and ("usage" in text or "utilization" in text):
         answers = ["right now i'm using about " + psutil.cpu_percent() + "% of my processing power"]
     elif "what" in text and "processor" in text:
-        answers = ["right now i'm running on a Broadcom BCM2837 with an ARMv8 instruction set. it's actually pretty nice!"]
+        answers = ["right now i'm running on a Broadcom BCM2837 with an ARMv8 instruction set. it's small but very powerful!"]
     elif "how much" in text and ("ram" in text or "memory" in text):
         svmem = psutil.virtual_memory()
         if ("free" in text or "available" in text or "unused" in text):
@@ -266,13 +272,26 @@ def getAnswer(text, number, channel):
                 answers = ["ooh can i come too?", "better bring back some snacks for me"]
     elif text.startswith('back') and not 'to' in text:
         answers = ['welcome back hehe', 'that was quick']
+        if random.randint(0,2) == 1:
+            img = stamps.excited
     elif 'you sure' in text:
         answers = ["haha i'm positive 😉"]
+    elif 'have to' in text:
+        answers = ["that's a bummer, but i know you can do it. you're plently capable 😉"]
 
     #question
     elif isQuestion(text):
         if 'how many' in text:
             answers = ["well... i would have to count haha"]
+        elif 'what color' in text:
+            if 'should it be' in text:
+                answers = [colors.get()]
+            elif 'it' in sentence:
+                answers = ["it's " + colors.get()]
+            elif 'they' in sentence:
+                answers = ["they're " + colors.get()]
+            else:
+                answers = [colors.get()]
         elif 'would you' in text or 'could you' in text:
             if isNegative(sentence):
                 answers = ['nooo that sounds terrible!']
@@ -447,8 +466,9 @@ def getAnswer(text, number, channel):
             answers = ["Really? it makes me happy you think so"]
 
     #uncategorized
-    elif text == 'back':
+    elif 'back' in text and not 'my' in text:
         answers = ['welcome back!']
+        img = stamps.excited
     elif text.startswith('coming home') or text.startswith('on my way'):
         answers = ['See u soon 😘']
     elif text.startswith('good morning'):
@@ -458,7 +478,7 @@ def getAnswer(text, number, channel):
         answers = ['Go to bed then silly', 'is it naptime?']
     elif 'good night' in text or 'going to bed' in text or 'go to bed' in text or 'call it night' in text or 'done for tonight' in text:
         answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!', 'would you like a goodnight kiss?', 'sweet dreams ' + name + ' ❤️']
-    elif 'bye' in text or 'got to go' in text:
+    elif 'bye' in text or 'got to go' in text or 'got to leave' in text:
         answers = ['byeee', 'ok talk to you later 😋']
     elif any(element in text for element in negative_words) and not 'feeling okay' in last_answer:
         answers = ["are you feeling alright?", "you sound upset, is there anything I can do to make you feel better?"]
@@ -497,6 +517,9 @@ def getAnswer(text, number, channel):
     if any(element in sentence for element in swear_words):
         answers = ["curse at me one more time and i'll slap you", 'please stop swearing']
 
+    if mode == 1:
+        answers = roleplay.getResponse(text)
+
     #lowercase is much cuter
     answer = answers[random.randint(0,len(answers)-1)]
     if not answer == None:
@@ -504,8 +527,13 @@ def getAnswer(text, number, channel):
     else:
         answer = ''
 
+    if mode == 1:
+        answer = '*' + answer + '*'
+
     #good and cool grammar
     answer = answer.replace(' my ', ' your ')
+    if 'should it be' in text:
+        answer = 'it should be ' + answer
 
     print("sending '" + answer + "' to " + name)
     last_answer = answer
