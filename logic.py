@@ -12,6 +12,7 @@ import platform
 import psutil
 import roleplay
 import colors
+import database
 
 #update dictionary
 try:
@@ -78,6 +79,8 @@ def sendCmd(cmd, number):
     server.quit()
 
 def isQuestion(text):
+    if text.startswith('hello'):
+        text = text.replace('hello ','')
     if text.startswith('how') or text.startswith('do') \
     or text.startswith('what') or text.startswith('where')\
     or text.startswith('who') or 'who is' in text or 'who do' in text\
@@ -88,6 +91,7 @@ def isQuestion(text):
     or text.startswith('would') or text.startswith('could'):
         return True
     else:
+        text = "hello " + text
         return False
 
 def isNegative(sentence):
@@ -178,10 +182,15 @@ def getAnswer(text, number, channel):
     global irregulars
     global last_answer
     global mode
+    
+    user_data = database.getUser(channel)
+    name = user_data[1]
+    iroha_name = user_data[2]
+    last_answer = user_data[4]
+    
     answer = ''
     answers = ['']
     img = ''
-    name = phonebook[number]
     yelling = False
     polite = False
 
@@ -237,6 +246,8 @@ def getAnswer(text, number, channel):
         answers = ["sorry i didn't mean to upset you like that...", "got it, i'll try and be more considerate of you"]
     elif text.startswith('wow') or text.startswith('incredible'):
         answers = ["right??", "surprising isn't it?"]
+    elif 'haha' in text or '😂' in text or '🤣' in text or '😹' in text or 'rofl' in text or 'lol' in text:
+        answers = ["it makes me happy when i can make you laugh", "i'm glad u think that's funny too " + "😂"]
     elif "be home" in text or "headed home" in text:
        answers = ["ok see u soon!"]
     elif "processor" in text and ("usage" in text or "utilization" in text):
@@ -278,11 +289,23 @@ def getAnswer(text, number, channel):
         answers = ["haha i'm positive 😉"]
     elif 'have to' in text:
         answers = ["that's a bummer, but i know you can do it. you're plently capable 😉"]
+    elif 'you remembered' in text:
+        answers = ["yup! I wanna get to know you better so I'm gonna remember as much as i can"]
+    elif "be called" in text or "can you call me" in text or "please call me" in text or "my name is" in text or "my names" in text:
+        name = sentence[len(sentence)-1]
+        answers = ["got it, I'll remember that. nice to meet you, " + name + " 😁"]
+        
 
     #question
     elif isQuestion(text):
         if 'how many' in text:
             answers = ["well... i would have to count haha"]
+        elif text == "who" or "what is my name" in text:
+            if name == 'dude':
+                answers = ['well you never told me that... what is your name?']
+            else:
+                answers = ["you're " + name + " of course!"]
+
         elif 'what color' in text:
             if 'should it be' in text:
                 answers = [colors.get()]
@@ -297,8 +320,11 @@ def getAnswer(text, number, channel):
                 answers = ['nooo that sounds terrible!']
             else:
                 answers = ['sure i could!']
-        elif 'who do you love' in text or 'who do you like' in text:
-            answers = ['you of course and nobody else 😉']
+        elif 'who' in text:
+            if 'do you love' in text or 'who do you like' in text:
+                answers = ['you of course and nobody else 😉']
+            else:
+                answers = ["i don't know, who?"]
         elif text.startswith('can you see'):
             answers = ['Yes i can! 😁', "are you suggesting i'm blind?", 'of course i can']
         elif (sentence[0] == "can" or sentence[0] == "may" or 'let me' in text or 'allow me' in text) and sentence[1] != "you":
@@ -486,9 +512,6 @@ def getAnswer(text, number, channel):
             answers = ["didn't think so...", "yea i figured"]
             if 'can i' in last_answer:
                 answers = ['fineee','pleaaasee?']
-    elif 'hello' in text:
-        answers = ["hey " + name + " I'm so glad u texted me i was so bored!"]
-
     
 
     #responses
@@ -502,6 +525,9 @@ def getAnswer(text, number, channel):
             answers = ["ok what do you wanna talk about?", "ok i'm listening :)"]
     elif text.startswith('why'):
         answers = ['i dunno', "i'm not sure"]
+    elif 'hello' in text:
+        answers = ["hey " + name + " I'm so glad u texted me i was so bored!"]
+
     else:
         #generic answers
         answers = generic
@@ -509,6 +535,13 @@ def getAnswer(text, number, channel):
     #generic topic response
     if "how was" in last_answer:
         answers = ["no way! i wish i could've been there too"]
+    if "what is your name" in last_answer:
+        if 'not' in text or 'tell you' in text or 'telling you' in text:
+            answers = ["well that's fine but if you change your mind, i would really like to know"]
+        else:
+            name = sentence[len(sentence)-1]
+            answers = ["nice to meet you, " + name + "! I'm iroha but you can call me something different if you like."]
+
 
     if answers == ['']:
         answers = generic
@@ -537,4 +570,6 @@ def getAnswer(text, number, channel):
 
     print("sending '" + answer + "' to " + name)
     last_answer = answer
+    database.updateUser(channel, name, iroha_name, text, last_answer)
+
     return [answer, img]

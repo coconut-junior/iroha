@@ -1,9 +1,9 @@
 import random
 import colors
 
-present_verbs = ['laughing', 'grinning', 'yawning', 'staring']
+present_verbs = ['laughing', 'grinning', 'yawning', 'running fingers through your hair']
 passive_verbs = ['sighs', 'laughs', 'winks', 'whistles']
-actions = ['strokes', 'touches', 'grabs', 'kicks', 'punches']
+actions = ['touches', 'grabs', 'kicks', 'punches']
 nouns = ['you']
 structures = ["$action $noun1 why did you do that?", "$verb1 while $verb2", "$verb1 and $action $noun1"]
 
