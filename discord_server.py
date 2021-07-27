@@ -9,22 +9,21 @@ from datetime import date
 import json
 import random
 from dateutil.easter import *
+import database
 
 msg_newyear = 'Happy new year! 🥳🥂'
 msg_easter = 'Happy easter! 🐰'
 msg_christmas = 'Merry Christmas! 🎄'
-known_channels = [] #we will keep these anonymous for now
+known_channels = []
 wake_time = "9" + ":" + str(random.randint(0,30))
-last_answer = ""
 wait_time = 0
-
-#fix reminders!
+cache = []
 
 class MyClient(discord.Client):
 
     async def on_ready(self):
-        global last_answer
-        global wait_time
+        global wait_times
+
         with  open('startup.txt', 'r') as f:
             contents = f.read()
             print(contents)
@@ -38,6 +37,8 @@ class MyClient(discord.Client):
         print('wake time is set to ' + wake_time)
 
         while True:
+            global wait_time
+            global cache
             t = str(datetime.now().hour) + ":" + str(datetime.now().minute)
             msg = None
 
@@ -56,25 +57,36 @@ class MyClient(discord.Client):
                     channel = client.get_channel(r['channel'])
                     await channel.send("hey looks like it's time to " + m)
 
-            if wait_time == 2:
-                annoyed_msg = ["so are you gonna answer me or what lol", "heyyy i asked you a question silly"]
-                msg = annoyed_msg[random.randint(0,len(annoyed_msg)-1)]
-
             #message everyone iroha knows
             if not msg == None:
                 for c in known_channels:
                     channel = client.get_channel(c)
                     await channel.send(msg)
+            
             #operate once a minute
-            await asyncio.sleep(60)
+            await asyncio.sleep(30)
             automation.uptime += 1
-            if '?' in last_answer:
-                wait_time += 1
+            wait_time += 1
+            users = database.getAll()
+            
+            print(cache)
 
+            for u in users:
+                uid = str(u[0])
+                last_answer = u[4]
+
+                if wait_time == 2 and '?' in last_answer and uid in cache:
+                    print('sending annoyed message...')
+                    channel = client.get_channel(int(uid))
+                    annoyed_msg = ["so are you gonna answer me or what lol", "heyyy i asked you a question silly"]
+                    msg = annoyed_msg[random.randint(0,len(annoyed_msg)-1)]
+                        
+                    await channel.send(msg)
+                    database.updateUser(u[0],u[1],u[2],u[3],msg)
+            if wait_time == 2:
+                wait_time = 0
     async def on_message(self, message):
-        global known_channels
-        global last_answer
-        global wait_time
+        global cache
         # don't respond to ourselves
         if message.author == self.user:
             return
@@ -85,13 +97,11 @@ class MyClient(discord.Client):
                 picture = discord.File(f)
                 await message.channel.send(file=picture)
 
-        if not message.channel.id in known_channels:
-            known_channels.append(message.channel.id)
-            print('adding channel ' + str(message.channel.id))
+        channel = str(message.channel.id)
+        await message.channel.send(answer[0])
+        if not channel in cache:
+            cache.append(channel)
 
-        last_answer = answer[0]
-        wait_time = 0
-        await message.channel.send(last_answer)
 
 client = MyClient()
 client.run('ODI2MTQxMjA2MDY1MDUzNzI3.YGIJ9A.5jYJ7v6JYFQgXoAxOFYK5MBy4Ag')

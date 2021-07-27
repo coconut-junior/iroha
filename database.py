@@ -42,4 +42,10 @@ def getUser(uid):
     c.execute("select * from users where uid=:uid",{"uid":uid})
     return c.fetchone()
 
+def getAll():
+    global con
+    global c
+    c.execute("select * from users")
+    return c.fetchall()
+
 print("loading database...")

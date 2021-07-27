@@ -332,13 +332,14 @@ def getAnswer(text, number, channel):
             if 'ask' in text:
                 answers = ["ask away, I'm listening 😊", "you can ask me anything " + name + "😊"]
         elif 'how are you' in text or 'how is it' in text:
+            weather.getWeather()
             if weather.temperature < 45:
                 answers = ['This cold weather has me dreaming of sandy beaches, fruity drinks and sunny days 😩',
                 'I could honestly go for a warm cup of tea rn',
-                "meh... could be better",
+                "I'm kinda chilly... would you like to cuddle me?",
                 "i'm good and all, but how are you " + name + "? that's what i'm really interested in!"]
             elif weather.temperature > 75:
-                answers = ["i just wish it wasn't sooo hot today 😓"]
+                answers = ["i just wish it wasn't sooo hot today 😓","right now i'm thinking about ice cream. if we ever go out on a date together can you buy me some? 🥺"]
             else:
                 answers = ['absolutely fantastic!', "I'm great, how are you? do you wanna talk about anything?"]
         elif 'call it night' in text:
@@ -510,7 +511,7 @@ def getAnswer(text, number, channel):
         answers = ["are you feeling alright?", "you sound upset, is there anything I can do to make you feel better?"]
         if text.startswith('no'):
             answers = ["didn't think so...", "yea i figured"]
-            if 'can i' in last_answer:
+            if 'can i' in last_answer or 'can you' in last_answer:
                 answers = ['fineee','pleaaasee?']
     
 
