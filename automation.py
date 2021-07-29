@@ -18,15 +18,19 @@ username = 'iroha.bot.official@gmail.com' #replace asap to avoid leaking credent
 password = 'scjldizwkyjodvhz'
 
 morning_hr = 10
-morning_min = random.randint(0,30)
-morning_greetings = ['Good morning ' + speech.owner + ' did u sleep well?', 
-'Sleep well, ' + speech.owner + '?', 'Rise and shine ' + speech.owner + ' ☺️']
+morning_min = random.randint(0,59)
+phrases = {"we":"the two of us", "sleep":"rest", "good":"great","nice":"awesome","promise":"swear"}
 
-#still looking for a good api
-def getPics(term):
-    j = requests.get("https://serpapi.com/search.json?q=" + term + "&tbm=isch&ijn=0&api_key=" + serpapi_key)
-    j_data = j.data()
-
+def rephrase(text):
+    sentence = text.split(' ')
+    new_text = ''
+    for i in range(len(sentence)):
+        w = sentence[i]
+        if random.randint(0,2) == 1 and w in phrases:
+            sentence[i] = phrases[w]
+        new_text += sentence[i] + ' '
+    
+    return new_text.strip()
 
 def getUptime():
     global uptime
@@ -45,39 +49,6 @@ def execute(task):
     elif task.startswith('remind:'):
         args = task.split(':')
         createReminder(args[1])
-
-#read write config
-def saveConfig():
-    global uptime
-    global reminders
-    global phone_number
-    try:
-        data = {}
-        data['owner'] = speech.owner
-        data['name'] = speech.name
-        data['uptime'] = uptime
-        data['reminders'] = reminders
-        data['phone_number'] = phone_number
-        with open(os.getenv("HOME") + '/iroha-config.json', 'w') as outfile:
-            json.dump(data, outfile, indent=4)
-    except:
-        print('failed to write config file')
-
-def loadConfig():
-    global uptime
-    global reminders
-    global phone_number
-    try:
-        with open (os.getenv("HOME") + '/iroha-config.json') as json_file:
-            data = json.load(json_file)
-            speech.owner = data['owner']
-            speech.name = data['name']
-            uptime = data['uptime']
-            reminders = data['reminders']
-            phone_number = data['phone_number']
-    except:
-        print('no config found, creating one...')
-        saveConfig()
 
 def add_years(d, years):
     new_year = d.year + years

@@ -64,25 +64,35 @@ class MyClient(discord.Client):
                     await channel.send(msg)
             
             #operate once a minute
-            await asyncio.sleep(30)
+            await asyncio.sleep(60)
             automation.uptime += 1
             wait_time += 1
             users = database.getAll()
-            
-            print(cache)
+            t = time.localtime()
+            hour = t.tm_hour
+            minute = t.tm_min
 
             for u in users:
                 uid = str(u[0])
                 last_answer = u[4]
 
-                if wait_time == 2 and '?' in last_answer and uid in cache:
+                if wait_time == 2 and '?' in last_answer and not 'really' in text and uid in cache:
                     print('sending annoyed message...')
                     channel = client.get_channel(int(uid))
-                    annoyed_msg = ["so are you gonna answer me or what lol", "heyyy i asked you a question silly"]
+                    annoyed_msg = ["so are you gonna answer me or what lol",
+                            "heyyy i asked you a question silly"]
                     msg = annoyed_msg[random.randint(0,len(annoyed_msg)-1)]
-                        
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg)
+                
+                if hour == 0 and minute == 14 and not 'night' in last_answer and not 'dream' in last_answer and uid in cache:
+                    print('sending bedtime reminder...')
+                    bedtime_warnings = ["hey it's getting kinda late... do you think you're gonna go to bed soon?"]
+                    msg = bedtime_warnings[random.randint(0,len(bedtime_warnings)-1)]
+                    channel = client.get_channel(int(uid))
+                    await channel.send(msg)
+                    database.updateUser(u[0],u[1],u[2],u[3],msg)
+                
             if wait_time == 2:
                 wait_time = 0
     async def on_message(self, message):
@@ -91,7 +101,7 @@ class MyClient(discord.Client):
         if message.author == self.user:
             return
 
-        answer = logic.getAnswer(message.content, automation.phone_number, message.channel.id)
+        answer = logic.getAnswer(message.content, message.channel.id)
         if not answer[1] == '':
             with open(answer[1], 'rb') as f:
                 picture = discord.File(f)

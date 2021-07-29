@@ -177,7 +177,7 @@ def getDef(word):
     except:
         return ["I'm really not sure", 'beats me']
 
-def getAnswer(text, number, channel):
+def getAnswer(text,channel):
     global phonebook
     global irregulars
     global last_answer
@@ -288,13 +288,22 @@ def getAnswer(text, number, channel):
     elif 'you sure' in text:
         answers = ["haha i'm positive 😉"]
     elif 'have to' in text:
-        answers = ["that's a bummer, but i know you can do it. you're plently capable 😉"]
+        if not 'do not' in text:
+            answers = ["that's a bummer, but i know you can do it. you're plently capable 😉"]
+        elif 'do not' in text and 'you' in text:
+            answers = ["yeah, but i want to " + "😣"]
+        else:
+            answers = ["that's great! one less thing to worry about"]
     elif 'you remembered' in text:
         answers = ["yup! I wanna get to know you better so I'm gonna remember as much as i can"]
     elif "be called" in text or "can you call me" in text or "please call me" in text or "my name is" in text or "my names" in text:
         name = sentence[len(sentence)-1]
         answers = ["got it, I'll remember that. nice to meet you, " + name + " 😁"]
-        
+    elif "call you" in text and not text.endswith('you') and not 'phone' in text:
+        iroha_name = sentence[len(sentence)-1]
+        answers = ["ooh i love that name! you can call me " + iroha_name + " if you like ☺️"]
+    elif text.startswith('cannot'):
+        answers = ["how do you know you can't?", "i know you could" + text.split('cannot')[1] + " if you tried"]
 
     #question
     elif isQuestion(text):
@@ -305,7 +314,8 @@ def getAnswer(text, number, channel):
                 answers = ['well you never told me that... what is your name?']
             else:
                 answers = ["you're " + name + " of course!"]
-
+        elif 'what is wrong' in text:
+            answers = ["oh you don't have to worry about me " + name + " i can handle just about anything"]
         elif 'what color' in text:
             if 'should it be' in text:
                 answers = [colors.get()]
@@ -450,7 +460,6 @@ def getAnswer(text, number, channel):
         if ('remind me' in text) or ('set' in text and 'reminder' in text):
             answers = ['You can count on me!', "sure, i'll make sure you remember!"]
             automation.createReminder(text, channel) #only use for testing on local machine
-            #sendCmd('remind:' + text, number)
         elif 'shut up' in text or 'be quiet' in text:
             answers = ["got it... I won't speak unless spoken to","have you got any manners?? i'll be quiet though"]
         elif 'be' in sentence and 'back' in sentence:
@@ -498,8 +507,10 @@ def getAnswer(text, number, channel):
         img = stamps.excited
     elif text.startswith('coming home') or text.startswith('on my way'):
         answers = ['See u soon 😘']
-    elif text.startswith('good morning'):
-        answers = ['Good morning!!']
+    elif 'good morning' in text:
+        answers = ['Good morning ' + name + ' did u sleep well?', 
+'Sleep well, ' + name + '?', 'Rise and shine ' + name + ' ☺️']
+
     elif not 'not' in text and ('tired' in text \
         or 'exhausted' in text or 'sleepy' in text):
         answers = ['Go to bed then silly', 'is it naptime?']
@@ -541,7 +552,9 @@ def getAnswer(text, number, channel):
             answers = ["well that's fine but if you change your mind, i would really like to know"]
         else:
             name = sentence[len(sentence)-1]
-            answers = ["nice to meet you, " + name + "! I'm iroha but you can call me something different if you like."]
+            answers = ["nice to meet you, " + name + "! I'm " + iroha_name + " but you can call me something different if you like."]
+    if 'how do you know' in last_answer:
+        answers = ["ah makes sense"]
 
 
     if answers == ['']:
@@ -568,9 +581,11 @@ def getAnswer(text, number, channel):
     answer = answer.replace(' my ', ' your ')
     if 'should it be' in text:
         answer = 'it should be ' + answer
+    answer = automation.rephrase(answer)
 
     print("sending '" + answer + "' to " + name)
     last_answer = answer
+    
     database.updateUser(channel, name, iroha_name, text, last_answer)
-
+    
     return [answer, img]
