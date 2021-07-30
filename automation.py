@@ -1,6 +1,5 @@
 import os
 import time
-import speech
 import json
 from twilio.rest import Client
 import requests
@@ -8,6 +7,7 @@ import random
 import datetime
 from datetime import date
 from calendar import isleap
+import subprocess
 
 reminders = []
 uptime = 0
@@ -31,6 +31,7 @@ def rephrase(text):
         new_text += sentence[i] + ' '
     
     return new_text.strip()
+
 
 def getUptime():
     global uptime

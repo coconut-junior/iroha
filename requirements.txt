@@ -2,10 +2,10 @@ pyglet
 gtts
 python-vlc
 geopy
+requests
 ip2geotools
 Nominatim
 python-nmap
-requests
 geopy
 nltk
 twilio

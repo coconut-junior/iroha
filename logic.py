@@ -13,6 +13,7 @@ import psutil
 import roleplay
 import colors
 import database
+import network
 
 #update dictionary
 try:
@@ -304,6 +305,11 @@ def getAnswer(text,channel):
         answers = ["ooh i love that name! you can call me " + iroha_name + " if you like ☺️"]
     elif text.startswith('cannot'):
         answers = ["how do you know you can't?", "i know you could" + text.split('cannot')[1] + " if you tried"]
+    elif 'like what?' in last_answer:
+        thing = sentence[0]
+        answers = likes(thing)
+
+
 
     #question
     elif isQuestion(text):
@@ -316,6 +322,16 @@ def getAnswer(text,channel):
                 answers = ["you're " + name + " of course!"]
         elif 'what is wrong' in text:
             answers = ["oh you don't have to worry about me " + name + " i can handle just about anything"]
+        elif 'what' in text and ('network' in text or 'wifi' in text):
+            ssids = network.getNetworks()
+            a = ''
+            for i in range(len(ssids)):
+                if i == len(ssids)-1:
+                    a += 'and ' + ssids[i]
+                else:
+                    a += ssids[i] + ', '
+
+            answers = ["some of the wifi networks near me are " + a]
         elif 'what color' in text:
             if 'should it be' in text:
                 answers = [colors.get()]
@@ -363,10 +379,13 @@ def getAnswer(text,channel):
             else:
                 answers = ['why not?']
         elif ('how about' in text or 'what about' in text or 'feel about' in text) and not 'we' in text:
-            try:
+            if 'feel about' in text:
                 thing = sentence[sentence.index('about') + 1]
                 answers = likes(thing)
-            except:
+            elif 'what about' in text:
+                thing = sentence[sentence.index('about') + 1]
+                answers = ['what about ' + thing + '?']
+            else:
                 answers = ['how about it?']
         elif text.startswith('what') or text.startswith('what does') or text.startswith('do you'):
             if 'synonym' in text or 'another word' in text or 'equivalent' in text:
@@ -415,6 +434,8 @@ def getAnswer(text,channel):
             elif 'weather' in text:
                 weather.getWeather()
                 answers = ["today it's supposed to be " + weather.report + " and the temperature is " + str(weather.temperature) + " degrees"]
+            elif 'do you' in text:
+                answers = ["yes, occasionally"]
             else:
                 if not 'this' in text and not 'that' in text and not 'those' in text and not 'these' in text:
                     sent = text.split(' ')
@@ -452,7 +473,6 @@ def getAnswer(text,channel):
         elif 'remember me' in text:
             answers = ['nope! actually yea, sorry that was a bit mean', 'how could i forget :)']
 
-
     #demand
     elif 'how about you' in last_answer:
         answers = ['ooh nice!!']
@@ -484,6 +504,12 @@ def getAnswer(text,channel):
             answers = ["Welcome home, " + name + " 😊"]
         elif 'make dinner' in text or 'making dinner' in text:
             answers = ["oooh what's for dinner? 🤤"]
+        elif 'feel' in text:
+            if 'feel' in sentence:
+                answers = ["it's okay to feel " + sentence[sentence.index('feel') + 1] + " i feel that way too sometimes"]
+            elif 'feeling' in sentence:
+                answers = ["it's okay to feel " + sentence[sentence.index('feeling') + 1] + " i feel that way too sometimes"]
+
         elif 'watched' in text:
             thing = sentence[sentence.index("watched") + 1]
             if thing == 'my':
@@ -524,11 +550,15 @@ def getAnswer(text,channel):
             answers = ["didn't think so...", "yea i figured"]
             if 'can i' in last_answer or 'can you' in last_answer:
                 answers = ['fineee','pleaaasee?']
+            if 'feeling' in last_answer and '?' in last_answer:
+                answers = ["it's okay i'm here for you"]
     
+    elif text.endswith('really'):
+        answers = ["yes, really"]
 
     #responses
     elif 'yes' in sentence or 'okay' in sentence:
-        answers = ['i thought so haha']
+        answers = ['i thought so haha', "that's good to hear 😊"]
         if last_answer == 'would you like a goodnight kiss?':
             answers = ['*kisses you*']
         elif 'plea' in last_answer or 'can i' in last_answer:
