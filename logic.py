@@ -85,7 +85,7 @@ def isQuestion(text):
     if text.startswith('how') or text.startswith('do') \
     or text.startswith('what') or text.startswith('where')\
     or text.startswith('who') or 'who is' in text or 'who do' in text\
-    or text.startswith('when')\
+    or text.startswith('when') or text.startswith('should')\
     or text.startswith('why') or text.startswith('how')\
     or text.startswith('are') or text.startswith('is')\
     or text.startswith('can') or text.startswith('may')\
@@ -308,13 +308,32 @@ def getAnswer(text,channel):
     elif 'like what?' in last_answer:
         thing = sentence[0]
         answers = likes(thing)
-
-
+    elif 'late' in sentence:
+        if 'work' in text:
+            if 'working' in text:
+                answers = ["oh okay, don't work too hard or i'll worry about you"]
+            elif 'for' in sentence:
+                answers = ["that's alright don't rush! I'm sure your boss will understand"]
+            else:
+                answers = ["i'm very disappointed in you, but for some reason i can't stay mad..."]
+        elif 'home' in text:
+            answers = ["I'll be waiting for you! Try not to fall asleep okay"]
+        else:
+            answers = ["i'm sure they'll understand! just make sure you apologize properly"]
+    elif 'on my break' in text or 'on break' in text or 'lunch break' in text:
+        answers = ["that's great! what are you gonna eat?"]
 
     #question
     elif isQuestion(text):
         if 'how many' in text:
-            answers = ["well... i would have to count haha"]
+            answers = ["well... i would have to count haha","like " + str(random.randint(1,10)) + " probably"]
+        elif 'should' in sentence:
+            if 'or' in sentence:
+                options = text.split('should ')[1].split('or')
+                option = options[random.randint(0,len(options)-1)].strip()
+                answers = ["that's up to you but if i had to decide i'd say " + option, "maybe you should " + option]
+            else:
+                answers = ["sure why don't you try it", "go for it!"]
         elif text == "who" or "what is my name" in text:
             if name == 'dude':
                 answers = ['well you never told me that... what is your name?']
@@ -448,6 +467,8 @@ def getAnswer(text,channel):
         elif 'are you' in text:
             if text.startswith('are you ' + bot_name):
                 answers = ['Well of course i am dummy', 'Pretty sure i am 🙄']
+            elif 'here' in sentence or 'there' in sentence:
+                answers = [iroha_name + "'s here, no need to worry"]
             elif 'busy' in text:
                 answers = ["nah not really, what's up?", "i'm free right now do you wanna talk about something?"]
             elif 'bot' in text or 'machine' in text or 'an ai' in text or 'artificial' in text or 'computer' in text:
@@ -608,14 +629,12 @@ def getAnswer(text,channel):
         answer = '*' + answer + '*'
 
     #good and cool grammar
-    answer = answer.replace(' my ', ' your ')
+    answer = answer.replace(' my ', ' your ').replace('myself','yourself')
     if 'should it be' in text:
         answer = 'it should be ' + answer
     answer = automation.rephrase(answer)
 
-    print("sending '" + answer + "' to " + name)
     last_answer = answer
-    
     database.updateUser(channel, name, iroha_name, text, last_answer)
     
     return [answer, img]

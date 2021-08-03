@@ -16,6 +16,3 @@ def getNetworks():
             if ssid != '' and not 'x00' in ssid:
                 ssids.append(ssid)
     return ssids
-
-print(getNetworks())
-

@@ -10,6 +10,8 @@ import json
 import random
 from dateutil.easter import *
 import database
+import psutil
+import ascii
 
 msg_newyear = 'Happy new year! 🥳🥂'
 msg_easter = 'Happy easter! 🐰'
@@ -35,12 +37,14 @@ class MyClient(discord.Client):
         print('------')
         print('current date is ' + str(date.today()))
         print('wake time is set to ' + wake_time)
-
+        
         while True:
             global wait_time
             global cache
             t = str(datetime.now().hour) + ":" + str(datetime.now().minute)
             msg = None
+
+            ascii.printStats()
 
             #holiday events
             if date.today().month == 1 and date.today().day == 1 and t == '0:0':
@@ -75,8 +79,9 @@ class MyClient(discord.Client):
             for u in users:
                 uid = str(u[0])
                 last_answer = u[4]
+                last_message = u[3]
 
-                if wait_time == 2 and '?' in last_answer and not 'really' in text and uid in cache:
+                if wait_time == 2 and '?' in last_answer and not 'really' in last_message and uid in cache:
                     print('sending annoyed message...')
                     channel = client.get_channel(int(uid))
                     annoyed_msg = ["so are you gonna answer me or what lol",
