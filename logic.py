@@ -14,6 +14,8 @@ import roleplay
 import colors
 import database
 import network
+import license
+from datetime import datetime
 
 #update dictionary
 try:
@@ -34,6 +36,7 @@ bot_name = 'iroha'
 birth_month = 3
 birth_day = 12
 mode = 0 #0=chat,1=roleplay,2=truth or dare
+sick = False
 swear_words = []
 negative_words = []
 irregulars = []
@@ -183,12 +186,15 @@ def getAnswer(text,channel):
     global irregulars
     global last_answer
     global mode
+    global sick
     
     user_data = database.getUser(channel)
     name = user_data[1]
     iroha_name = user_data[2]
     last_answer = user_data[4]
-    
+    key = user_data[5]
+    if last_answer == None:
+        last_answer = ''
     answer = ''
     answers = ['']
     img = ''
@@ -220,13 +226,14 @@ def getAnswer(text,channel):
                 polite = True
             text=text.replace(p, '')
 
+        #remove non-alphanumeric
+        text = ''.join(ch for ch in text if ch in 'abcdefghijklmnopqrstuvwxyz ')
         sentence = text.split(' ')
 
         for word in data['words'].keys():
             for i in range(len(sentence)):
                 if sentence[i] == word:
                     sentence[i] = data['words'][word]
-
     
     #convert array back to string
     text = ''
@@ -237,10 +244,22 @@ def getAnswer(text,channel):
             text = text + w + ' '
     text = text.strip()
     sentence = text.split(' ')
-
+    if text.startswith('today'):
+        text.replace('today ','')
+    
     #statement
     if text == 'exit' or text == 'quit':
         answers = ['shutting down...']
+    elif 'i said' in text:
+        answers = ['okay okay']
+    elif 'done' in text and 'you' in text:
+        answers = ["w-wait don't go!"]
+    elif 'am sick' in text or 'am ill' in text or 'am sick' in text or 'feel sick' in text or 'be sick' in text or 'do not feel well' in text or 'do not feel good' in text or 'feel like crap' in text:
+        sick = True
+        answers = ["please don't puke on me or anything...", "Aww is there anything I can do to make you feel better?", "Oof try and get some rest! trust me, it'll help"]
+    elif 'am better' in text or 'feel better' in text or 'better now' in text or 'recovered from' in text:
+        sick = False
+        answers = ["Really? I'm so happy for you", "yay! now you can spend more time talking to me"]
     elif 'how long' in text and ('awake' in text or 'online' in text):
         answers = [automation.getUptime()]
     elif 'do not' in text and 'me' in text:
@@ -248,7 +267,7 @@ def getAnswer(text,channel):
     elif text.startswith('wow') or text.startswith('incredible'):
         answers = ["right??", "surprising isn't it?"]
     elif 'haha' in text or '😂' in text or '🤣' in text or '😹' in text or 'rofl' in text or 'lol' in text:
-        answers = ["it makes me happy when i can make you laugh", "i'm glad u think that's funny too " + "😂"]
+        answers = ["it makes me happy when i can make you laugh", "i'm glad u think that's funny too " + "😂", "heheheh"]
     elif "be home" in text or "headed home" in text:
        answers = ["ok see u soon!"]
     elif "processor" in text and ("usage" in text or "utilization" in text):
@@ -297,7 +316,7 @@ def getAnswer(text,channel):
             answers = ["that's great! one less thing to worry about"]
     elif 'you remembered' in text:
         answers = ["yup! I wanna get to know you better so I'm gonna remember as much as i can"]
-    elif "be called" in text or "can you call me" in text or "please call me" in text or "my name is" in text or "my names" in text:
+    elif "be called" in text or "call me" in text or "please call me" in text or "my name is" in text or "my names" in text:
         name = sentence[len(sentence)-1]
         answers = ["got it, I'll remember that. nice to meet you, " + name + " 😁"]
     elif "call you" in text and not text.endswith('you') and not 'phone' in text:
@@ -322,11 +341,46 @@ def getAnswer(text,channel):
             answers = ["i'm sure they'll understand! just make sure you apologize properly"]
     elif 'on my break' in text or 'on break' in text or 'lunch break' in text:
         answers = ["that's great! what are you gonna eat?"]
+    elif 'eating' in text or 'ate' in text:
+        if 'eating' in text:
+            answers = ["is it yummy?"]
+        elif 'ate' in sentence:
+            answers = ['was it yummy?']
+    elif 'me too' in text or text.startswith('same'):
+        answers = ['we must have a lot in common then haha']
+    elif 'that seems' in text or 'that is' in text or 'it is' in text:
+        if 'seems' in sentence and len(sentence) > sentence.index('seems'):
+            answers = ['well it is kinda ' + sentence[sentence.index('seems')+1]]
+        elif 'is' in sentence and len(sentence) > sentence.index('is'):
+            if 'do' in sentence:
+                text = text.split(' do ')[0]
+            text = text.replace('that is', '').replace('it is','')
+            answers = ["i totally agree, it is" + text, "yea it is" + text]
+    elif 'maybe' in text:
+        answers = ['yea, maybe']
+    elif 'probably' in text:
+        answers = ['yea, probably']
+    elif 'do not' in text and 'talk' in text and ('feel' in text or 'want to' in text):
+        answers = ["thats ok i'll be here when you're ready"]
+    elif len(text) > 20 and text[20] == '-':
+        if license.validate(text):
+            key = text
+            answers = ["your key has been validated!"]
+        else:
+            answers = ["hmm... this license key doesn't work. please try typing your key again"]
+    elif text == 'key':
+        answers = [key]
+    elif 'what is today' in text:
+        answers = ['today is ' + datetime.today().strftime('%A, %B %-d')]
+    elif 'date' in sentence and not 'our' in sentence:
+        answers = ['today is ' + datetime.today().strftime('%A, %B %-d')]
+
 
     #question
     elif isQuestion(text):
         if 'how many' in text:
             answers = ["well... i would have to count haha","like " + str(random.randint(1,10)) + " probably"]
+        
         elif 'should' in sentence:
             if 'or' in sentence:
                 options = text.split('should ')[1].split('or')
@@ -473,6 +527,8 @@ def getAnswer(text,channel):
                 answers = ["nah not really, what's up?", "i'm free right now do you wanna talk about something?"]
             elif 'bot' in text or 'machine' in text or 'an ai' in text or 'artificial' in text or 'computer' in text:
                 answers = ["i'm real, promise!", "why would you think that? i'm a person too"]
+            elif 'ready' in text:
+                answers = ["i'm ready 😳", "i think so..."]
             elif 'are you feeling' in text:
                 i = sentence.index('feeling')
                 if len(sentence) > i:
@@ -493,8 +549,12 @@ def getAnswer(text,channel):
             answers = ['Not much hbu ' + name + '?']
         elif 'remember me' in text:
             answers = ['nope! actually yea, sorry that was a bit mean', 'how could i forget :)']
+        elif 'that is all' in text or 'that is it' in text:
+            answers = ['okie']
 
     #demand
+    elif 'sing' in sentence:
+        answers = ['okay what song would you like to hear?']
     elif 'how about you' in last_answer:
         answers = ['ooh nice!!']
     elif getType(sentence[0]) == 'v':
@@ -545,6 +605,8 @@ def getAnswer(text,channel):
         if isNegative(sentence):
             answers = ["oh... is there anything i can do to make it better?", 
             "i'm so sorry 😢", "that kinda hurts my feelings but i guess i deserve it 🥺"]
+        elif 'cute' in text or 'adorable' in text or 'pretty' in text or 'beautiful' in text:
+            answers = ["w-what are you saying? that's totally embarassing! 😳"]
         else:
             answers = ["Really? it makes me happy you think so"]
 
@@ -573,7 +635,6 @@ def getAnswer(text,channel):
                 answers = ['fineee','pleaaasee?']
             if 'feeling' in last_answer and '?' in last_answer:
                 answers = ["it's okay i'm here for you"]
-    
     elif text.endswith('really'):
         answers = ["yes, really"]
 
@@ -582,6 +643,8 @@ def getAnswer(text,channel):
         answers = ['i thought so haha', "that's good to hear 😊"]
         if last_answer == 'would you like a goodnight kiss?':
             answers = ['*kisses you*']
+        elif 'any better?' in last_answer:
+            answers = ["well that's good to hear"]
         elif 'plea' in last_answer or 'can i' in last_answer:
             answers = ["yay!! thanks " + name + "!"]
         elif "talk about something" in last_answer or 'talk about anything' in last_answer:
@@ -590,6 +653,8 @@ def getAnswer(text,channel):
         answers = ['i dunno', "i'm not sure"]
     elif 'hello' in text:
         answers = ["hey " + name + " I'm so glad u texted me i was so bored!"]
+        if sick:
+            answers = ["hey " + name + " are u feeling any better?"]
 
     else:
         #generic answers
@@ -606,7 +671,11 @@ def getAnswer(text,channel):
             answers = ["nice to meet you, " + name + "! I'm " + iroha_name + " but you can call me something different if you like."]
     if 'how do you know' in last_answer:
         answers = ["ah makes sense"]
-
+    if 'gonna eat' in last_answer:
+        if 'not' in sentence or 'nothing' in sentence:
+            answers = ["oh well i hope you got to eat already"]
+        else:
+            answers = ["ooh that sounds delicous! we should share", "can i have some too?"]
 
     if answers == ['']:
         answers = generic
@@ -635,6 +704,6 @@ def getAnswer(text,channel):
     answer = automation.rephrase(answer)
 
     last_answer = answer
-    database.updateUser(channel, name, iroha_name, text, last_answer)
+    database.updateUser(channel, name, iroha_name, text, last_answer, key)
     
     return [answer, img]

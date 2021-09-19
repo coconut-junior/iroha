@@ -1,10 +1,16 @@
 import time
 import random
+from datetime import datetime
 
 char_list = "abcdefghijklmnopqrstuvwxyz1234567890"
-secret = 800
-check = 8
-length = 15
+secret = 1688
+check = 20
+length = 20
+
+def activationDate(key):
+    ts = int(key.split('-')[1])
+    date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    return date
 
 def validate(key):
     total = 0
@@ -30,7 +36,6 @@ def generate():
             break
         else:
             key = ''
-    
+    key += '-' + str(int(time.time()))
     print(key)
     return key
-

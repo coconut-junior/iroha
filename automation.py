@@ -21,6 +21,11 @@ morning_hr = 10
 morning_min = random.randint(0,59)
 phrases = {"we":"the two of us", "sleep":"rest", "good":"great","nice":"awesome","promise":"swear"}
 
+def morningMessage():
+    messages = ["Good morning name did you sleep well?", "Morning! Did you have any dreams about me?","Morninggg" ]
+    msg = messages[random.randint(0,len(messages)-1)]
+    return msg
+
 def rephrase(text):
     sentence = text.split(' ')
     new_text = ''
