@@ -191,6 +191,7 @@ def getAnswer(text,channel):
     user_data = database.getUser(channel)
     name = user_data[1]
     iroha_name = user_data[2]
+    last_message = user_data[3]
     last_answer = user_data[4]
     key = user_data[5]
     if last_answer == None:
@@ -252,8 +253,12 @@ def getAnswer(text,channel):
         answers = ['shutting down...']
     elif 'i said' in text:
         answers = ['okay okay']
+    elif text == last_message:
+        answers = ["Stop repeating yourself! God you're so annoying", "I heard you the first time! Are you stupid?"]
     elif 'done' in text and 'you' in text:
         answers = ["w-wait don't go!"]
+    elif 'forgot' in text and not 'you' in text:
+        answers = ["well next time don't forget!", "i totally would've reminded you! 😒"]
     elif 'am sick' in text or 'am ill' in text or 'am sick' in text or 'feel sick' in text or 'be sick' in text or 'do not feel well' in text or 'do not feel good' in text or 'feel like crap' in text:
         sick = True
         answers = ["please don't puke on me or anything...", "Aww is there anything I can do to make you feel better?", "Oof try and get some rest! trust me, it'll help"]
@@ -358,6 +363,8 @@ def getAnswer(text,channel):
             answers = ["i totally agree, it is" + text, "yea it is" + text]
     elif 'maybe' in text:
         answers = ['yea, maybe']
+    elif 'will stop' in text:
+        answers = ["jeez! you better"]
     elif 'probably' in text:
         answers = ['yea, probably']
     elif 'do not' in text and 'talk' in text and ('feel' in text or 'want to' in text):
@@ -623,7 +630,7 @@ def getAnswer(text,channel):
     elif not 'not' in text and ('tired' in text \
         or 'exhausted' in text or 'sleepy' in text):
         answers = ['Go to bed then silly', 'is it naptime?']
-    elif 'good night' in text or 'going to bed' in text or 'go to bed' in text or 'call it night' in text or 'done for tonight' in text:
+    elif 'good night' in text or 'going to bed' in text or 'go to bed' in text or 'call it night' in text or 'done for tonight' in text and not 'goodnight' in last_answer:
         answers = ['Ok, goodnight! ❤️', 'Goodnight, sleepyhead!', 'would you like a goodnight kiss?', 'sweet dreams ' + name + ' ❤️']
     elif 'bye' in text or 'got to go' in text or 'got to leave' in text:
         answers = ['byeee', 'ok talk to you later 😋']
@@ -663,6 +670,8 @@ def getAnswer(text,channel):
     #generic topic response
     if "how was" in last_answer:
         answers = ["no way! i wish i could've been there too"]
+    if 'goodnight' in text and 'goodnight' in last_answer:
+        answers = ["😊"]
     if "what is your name" in last_answer:
         if 'not' in text or 'tell you' in text or 'telling you' in text:
             answers = ["well that's fine but if you change your mind, i would really like to know"]
@@ -680,27 +689,18 @@ def getAnswer(text,channel):
     if answers == ['']:
         answers = generic
     if yelling and not 'omg' in text and not 'lol' in text and not 'haha' in text and not 'yes' in text:
-        answers = ['WHY ARE YOU YELLING',"stop yelling you're scaring me"]
+        answers = ['WHY ARE YOU YELLING',"No need to use caps jeez"]
     if any(element in sentence for element in swear_words):
         answers = ["curse at me one more time and i'll slap you", 'please stop swearing']
 
-    if mode == 1:
-        answers = roleplay.getResponse(text)
-
+    lambda answers : answers = roleplay.getResponse(text) if mode == 1
     #lowercase is much cuter
     answer = answers[random.randint(0,len(answers)-1)]
-    if not answer == None:
-        answer = answer.lower()
-    else:
-        answer = ''
-
-    if mode == 1:
-        answer = '*' + answer + '*'
-
+    lambda answer : answer = answer.lower() if not None else ''
+    lambda answer : answer = '*' + answer + '*' if mode == 1
     #good and cool grammar
     answer = answer.replace(' my ', ' your ').replace('myself','yourself')
-    if 'should it be' in text:
-        answer = 'it should be ' + answer
+    lambda answer : answer = 'it should be ' + answer if 'should it be' in text
     answer = automation.rephrase(answer)
 
     last_answer = answer

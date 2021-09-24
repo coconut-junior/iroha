@@ -80,32 +80,31 @@ class MyClient(discord.Client):
             for u in users:
                 uid = str(u[0])
                 last_answer = u[4]
+                channel = client.get_channel(int(uid))
                 if last_answer == None:
                     last_answer = ''
                 last_message = u[3]
                 
-                if wait_time == 2 and '?' in last_answer and not 'really' in last_message and uid in cache:
-                    print('sending annoyed message...')
-                    channel = client.get_channel(int(uid))
-                    annoyed_msg = ["you still there?",
+                if wait_time == 4 and '?' in last_answer and not 'really' in last_answer and uid in cache:
+                    annoyed_msg = ["hey you still there",
                             "heyyy i asked you a question silly"]
                     msg = annoyed_msg[random.randint(0,len(annoyed_msg)-1)]
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
 
                 if hour == int(wake_time.split(':')[0]) and minute == int(wake_time.split(':')[1]):
-                        await channel.send(automation.morningMessage.replace('name', u[1]))
-                        database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
+                    
+                    await channel.send(automation.morningMessage().replace('name', u[1]))
+                    database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
                 if hour == 0 and minute == 14 and not 'night' in last_answer and not 'dream' in last_answer and uid in cache:
-                    print('sending bedtime reminder...')
                     bedtime_warnings = ["hey it's getting kinda late... do you think you're gonna go to bed soon?"]
                     msg = bedtime_warnings[random.randint(0,len(bedtime_warnings)-1)]
-                    channel = client.get_channel(int(uid))
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
                 
-            if wait_time == 2:
+            if wait_time == 4:
                 wait_time = 0
+    
     async def on_message(self, message):
         global cache
         # don't respond to ourselves
