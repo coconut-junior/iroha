@@ -693,14 +693,16 @@ def getAnswer(text,channel):
     if any(element in sentence for element in swear_words):
         answers = ["curse at me one more time and i'll slap you", 'please stop swearing']
 
-    lambda answers : answers = roleplay.getResponse(text) if mode == 1
-    #lowercase is much cuter
+    if mode==1:
+        answers = roleplay.getResponse(text)
     answer = answers[random.randint(0,len(answers)-1)]
-    lambda answer : answer = answer.lower() if not None else ''
-    lambda answer : answer = '*' + answer + '*' if mode == 1
-    #good and cool grammar
+    if answer != None:
+        answer = answer.lower()
+    if mode==1:
+        answer = '*' + answer + '*'
     answer = answer.replace(' my ', ' your ').replace('myself','yourself')
-    lambda answer : answer = 'it should be ' + answer if 'should it be' in text
+    if 'should it be' in text:
+        answer = 'it should be ' + answer
     answer = automation.rephrase(answer)
 
     last_answer = answer
