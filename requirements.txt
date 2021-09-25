@@ -13,3 +13,4 @@ inflect
 python-dateutil
 discord.py
 psutil
+lifxlan
