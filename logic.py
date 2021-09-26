@@ -16,6 +16,7 @@ import database
 import network
 import license
 from datetime import datetime
+import lights
 
 #update dictionary
 try:
@@ -381,7 +382,15 @@ def getAnswer(text,channel):
         answers = ['today is ' + datetime.today().strftime('%A, %B %-d')]
     elif 'date' in sentence and not 'our' in sentence:
         answers = ['today is ' + datetime.today().strftime('%A, %B %-d')]
-
+    elif 'light' in text or 'lamp' in text and ('on' in text or 'off' in text):
+        if 'on' in text:
+            answers = ["As you wish!"]
+            lights.turn_on()
+        elif 'off' in text:
+            answers = ["Lights out!"]
+            lights.turn_off()
+        if not polite:
+            answers = ["would it kill you to ask nicely?"]
 
     #question
     elif isQuestion(text):
