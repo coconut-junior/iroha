@@ -213,6 +213,7 @@ def getAnswer(text,channel):
     with open ('rules/word_corrections.json') as json_file:
         text = text.lower()
         text = text.strip()
+        text = text.replace('i did','yes')
         data = json.load(json_file)
         punctuation = data['punctuation']
         irregulars = data['irregulars']
@@ -229,7 +230,7 @@ def getAnswer(text,channel):
             text=text.replace(p, '')
 
         #remove non-alphanumeric
-        text = ''.join(ch for ch in text if ch in 'abcdefghijklmnopqrstuvwxyz ')
+        text = ''.join(ch for ch in text if ch in 'abcdefghijklmnopqrstuvwxyz 0123456789')
         sentence = text.split(' ')
 
         for word in data['words'].keys():

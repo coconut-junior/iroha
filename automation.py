@@ -8,6 +8,7 @@ import datetime
 from datetime import date
 from calendar import isleap
 import subprocess
+import re
 
 reminders = []
 uptime = 0
@@ -91,6 +92,16 @@ def createReminder(text, channel):
     target_date = datetime.date.today()
     msg = ''
 
+    if 'minutes' in text:
+        offset = int(re.sub("[^0-9]", "", text))
+        new_time = (datetime.datetime.now() + datetime.timedelta(minutes = offset))
+        text = text.replace(str(offset), datetime.datetime.strftime(new_time, "%I:%M%p").lower())
+    elif 'hours' in text:
+        offset = int(re.sub("[^0-9]", "", text))
+        new_time = (datetime.datetime.now() + datetime.timedelta(hours = offset))
+        text = text.replace(str(offset), datetime.datetime.strftime(new_time, "%I:%M%p").lower())
+
+
     #if am/pm not specified decide which
     if not 'am' in text and not 'pm' in text:
         i = 0
@@ -143,7 +154,7 @@ def createReminder(text, channel):
             print(e)
             pass
 
-    #push time to specific day
+        #push time to specific day
     try:
         if 'today' in msg:
             msg = msg.replace('today', '')
