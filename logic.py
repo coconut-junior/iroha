@@ -93,7 +93,8 @@ def isQuestion(text):
     or text.startswith('why') or text.startswith('how')\
     or text.startswith('are') or text.startswith('is')\
     or text.startswith('can') or text.startswith('may')\
-    or text.startswith('would') or text.startswith('could'):
+    or text.startswith('would') or text.startswith('could')\
+    or text.startswith('did'):
         return True
     else:
         text = "hello " + text
@@ -259,6 +260,8 @@ def getAnswer(text,channel):
         answers = ["Stop repeating yourself! God you're so annoying", "I heard you the first time! Are you stupid?"]
     elif 'done' in text and 'you' in text:
         answers = ["w-wait don't go!"]
+    elif 'malfunctioning' in text or 'glitch' in text or 'broke' in text and 'you' in text:
+        answers = ["sorry, did i say something weird? I'll try to work on that"]
     elif 'forgot' in text and not 'you' in text:
         answers = ["well next time don't forget!", "i totally would've reminded you! 😒"]
     elif 'am sick' in text or 'am ill' in text or 'am sick' in text or 'feel sick' in text or 'be sick' in text or 'do not feel well' in text or 'do not feel good' in text or 'feel like crap' in text:
@@ -315,7 +318,7 @@ def getAnswer(text,channel):
     elif 'you sure' in text:
         answers = ["haha i'm positive 😉"]
     elif 'have to' in text:
-        if not 'do not' in text:
+        if not 'do not' in text and not 'you' in text:
             answers = ["that's a bummer, but i know you can do it. you're plently capable 😉"]
         elif 'do not' in text and 'you' in text:
             answers = ["yeah, but i want to " + "😣"]
@@ -362,7 +365,7 @@ def getAnswer(text,channel):
             if 'do' in sentence:
                 text = text.split(' do ')[0]
             text = text.replace('that is', '').replace('it is','')
-            answers = ["i totally agree, it is" + text, "yea it is" + text]
+            answers = ["i totally agree, it is" + text, "yea it is"]
     elif 'maybe' in text:
         answers = ['yea, maybe']
     elif 'will stop' in text:
@@ -383,11 +386,11 @@ def getAnswer(text,channel):
         answers = ['today is ' + datetime.today().strftime('%A, %B %-d')]
     elif 'date' in sentence and not 'our' in sentence:
         answers = ['today is ' + datetime.today().strftime('%A, %B %-d')]
-    elif 'light' in text or 'lamp' in text and ('on' in text or 'off' in text):
+    elif 'light' in text or 'lamp' in text and ('on' in text or 'off' in text or 'out' in text):
         if 'on' in text:
             answers = ["As you wish!"]
             lights.turn_on()
-        elif 'off' in text:
+        elif 'off' in text or 'out' in text:
             answers = ["Lights out!"]
             lights.turn_off()
         if not polite:
@@ -538,6 +541,8 @@ def getAnswer(text,channel):
         elif 'are you' in text:
             if text.startswith('are you ' + bot_name):
                 answers = ['Well of course i am dummy', 'Pretty sure i am 🙄']
+            elif 'going to' in text:
+                answers = ["Well... would you like me to?"]
             elif 'here' in sentence or 'there' in sentence:
                 answers = [iroha_name + "'s here, no need to worry"]
             elif 'busy' in text:
@@ -568,7 +573,18 @@ def getAnswer(text,channel):
             answers = ['nope! actually yea, sorry that was a bit mean', 'how could i forget :)']
         elif 'that is all' in text or 'that is it' in text:
             answers = ['okie']
-
+        elif 'how' in text:
+            if 'how was' in text:
+                answers = ["it was great, thank you for asking!"]
+            elif 'how is' in text:
+                answers = ["it's good, thank you. absolutely wonderful, in fact."]
+        elif 'did' in text:
+            if 'did you' in text:
+                answers = ["maybe i did... i'm not really sure to be honest"]
+            else:
+                if len(sentence) > 1:
+                    n = sentence[sentence.index('did') + 1]
+                    answers = ["pretty sure " + n + " did but what do i know"]
     #demand
     elif 'sing' in sentence:
         answers = ['okay what song would you like to hear?']
@@ -652,7 +668,7 @@ def getAnswer(text,channel):
                 answers = ['fineee','pleaaasee?']
             if 'feeling' in last_answer and '?' in last_answer:
                 answers = ["it's okay i'm here for you"]
-    elif text.endswith('really'):
+    elif text.endswith('really') or text == 'really':
         answers = ["yes, really"]
 
     #responses
@@ -660,6 +676,8 @@ def getAnswer(text,channel):
         answers = ['i thought so haha', "that's good to hear 😊"]
         if last_answer == 'would you like a goodnight kiss?':
             answers = ['*kisses you*']
+        elif 'like me to' in last_answer:
+            answers = ["Okay, I will then ☺️"]
         elif 'any better?' in last_answer:
             answers = ["well that's good to hear"]
         elif 'plea' in last_answer or 'can i' in last_answer:
@@ -710,7 +728,7 @@ def getAnswer(text,channel):
         answer = answer.lower()
     if mode==1:
         answer = '*' + answer + '*'
-    answer = answer.replace(' my ', ' your ').replace('myself','yourself')
+    answer = answer.replace('myself','yourself')
     if 'should it be' in text:
         answer = 'it should be ' + answer
     answer = automation.rephrase(answer)

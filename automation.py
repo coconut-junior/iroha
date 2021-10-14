@@ -21,9 +21,15 @@ password = 'scjldizwkyjodvhz'
 phrases = {"we":"the two of us", "sleep":"rest", "good":"great","nice":"awesome","promise":"swear"}
 
 def morningMessage():
-    messages = ["Good morning name did you sleep well?", "Morning! Did you have any dreams about me?","Morninggg","Good morning name. Hope you slept well!","Are you awake yet? 🥺","Good morning! When do I get to see your cute face again?","Good morning handsome! Did you sleep well? Or were you too busy dreaming about me… 😉","How’d you sleeeeep?","You’re going to kill it today, I believe in you! XO 💛" ]
+    messages = ["Good morning name did you sleep well?", "Morning! Did you have any dreams about me?","Morninggg","Good morning name. Hope you slept well!","Morningg are you awake yet? 🥺","Good morning! When do I get to see your cute face again?","Good morning handsome! Did you sleep well? Or were you too busy dreaming about me… 😉","Morning! How’d you sleeeeep?","Good morning name. You’re going to kill it today, I believe in you! XO 💛" ]
     msg = messages[random.randint(0,len(messages)-1)]
-    return msg
+    return msg.lower()
+
+def nightMessage():
+    messages = ["In a perfect world, every night would begin with a cuddle with you and every day would begin with a kiss from you. Good night name.","Goodnight name. I don’t know what I’d do without you – you mean everything to me.","Wishing you a good night is pointless because I know that neither of us is going to be happy being away from each other. Xoxo"]
+    msg = messages[random.randint(0,len(messages)-1)]
+
+    return msg.lower()
 
 def rephrase(text):
     sentence = text.split(' ')
@@ -92,14 +98,14 @@ def createReminder(text, channel):
     target_date = datetime.date.today()
     msg = ''
 
-    if 'minutes' in text:
+    if 'minutes' in text or 'minute' in text:
         offset = int(re.sub("[^0-9]", "", text))
         new_time = (datetime.datetime.now() + datetime.timedelta(minutes = offset))
-        text = text.replace(str(offset), datetime.datetime.strftime(new_time, "%I:%M%p").lower())
-    elif 'hours' in text:
+        text = text.replace(str(offset), datetime.datetime.strftime(new_time, "%I:%M%p").lower()).replace('minutes','').replace('minute','')
+    elif 'hours' in text or 'hour' in text:
         offset = int(re.sub("[^0-9]", "", text))
         new_time = (datetime.datetime.now() + datetime.timedelta(hours = offset))
-        text = text.replace(str(offset), datetime.datetime.strftime(new_time, "%I:%M%p").lower())
+        text = text.replace(str(offset), datetime.datetime.strftime(new_time, "%I:%M%p").lower()).replace('hours','').replace('hour','')
 
 
     #if am/pm not specified decide which
@@ -183,10 +189,11 @@ def createReminder(text, channel):
 
         r = {}
         r['date'] = str(target_date)
-        r['time'] = str(hr) + ':' + str(mn)
-        r['message'] = msg
+        r['time'] = [hr,mn]
+        r['message'] = msg.replace('my','your')
         r['channel'] = channel
         reminders.append(r)
+        print(reminders)
 
 def sendSMS(message, number):
     global iroha_number

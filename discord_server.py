@@ -17,7 +17,8 @@ msg_newyear = 'Happy new year! 🥳🥂'
 msg_easter = 'Happy easter! 🐰'
 msg_christmas = 'Merry Christmas! 🎄'
 known_channels = []
-wake_time = str(random.randint(9,10)) + ":" + str(random.randint(0,30))
+wake_time = [random.randint(9,10),random.randint(0,30)]
+sleep_time = [random.randint(22,23),random.randint(0,30)]
 checkin_time = str(random.randint(12,20)) + ":" + str(random.randint(0,30))
 wait_time = 0
 cache = []
@@ -42,13 +43,13 @@ class MyClient(discord.Client):
         while True:
             global wait_time
             global cache
-            t = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+            t = [datetime.now().hour,datetime.now().minute]
             msg = None
 
             ascii.printStats()
 
             #holiday events
-            if date.today().month == 1 and date.today().day == 1 and t == '0:0':
+            if date.today().month == 1 and date.today().day == 1 and t == [0,0]:
                 msg = msg_newyear
             if str(date.today()) == easter(date.today().year) and t == wake_time:
                 msg = msg_easter
@@ -80,25 +81,25 @@ class MyClient(discord.Client):
             for u in users:
                 uid = str(u[0])
                 last_answer = u[4]
+                await client.wait_until_ready()
                 channel = client.get_channel(int(uid))
                 if last_answer == None:
                     last_answer = ''
                 last_message = u[3]
                 
-                if wait_time == 4 and '?' in last_answer and not 'really' in last_answer and uid in cache:
+                if wait_time == 4 and '?' in last_answer and not 'really' in last_answer and not channel == None:
                     annoyed_msg = ["hey you still there",
                             "heyyy i asked you a question silly"]
                     msg = annoyed_msg[random.randint(0,len(annoyed_msg)-1)]
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
 
-                if hour == int(wake_time.split(':')[0]) and minute == int(wake_time.split(':')[1]):
-                    
-                    await channel.send(automation.morningMessage().replace('name', u[1]))
+                if hour == wake_time[0] and minute == wake_time[1] and not 'morning' in last_answer and not channel == None:
+                    msg = automation.morningMessage().replace('name',u[1])
+                    await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
-                if hour == 0 and minute == 14 and not 'night' in last_answer and not 'dream' in last_answer and uid in cache:
-                    bedtime_warnings = ["hey it's getting kinda late... do you think you're gonna go to bed soon?"]
-                    msg = bedtime_warnings[random.randint(0,len(bedtime_warnings)-1)]
+                    if hour == sleep_time[0] and minute == sleep_time[1] and not 'night' in last_answer and not 'dream' in last_answer and not 'bed' in last_answer and not channel == None:
+                    msg = automation.nightMessage().replace('name',u[1])
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
                 
