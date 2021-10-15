@@ -98,7 +98,7 @@ class MyClient(discord.Client):
                     msg = automation.morningMessage().replace('name',u[1])
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
-                    if hour == sleep_time[0] and minute == sleep_time[1] and not 'night' in last_answer and not 'dream' in last_answer and not 'bed' in last_answer and not channel == None:
+                if hour == sleep_time[0] and minute == sleep_time[1] and not 'night' in last_answer and not 'dream' in last_answer and not 'bed' in last_answer and not channel == None:
                     msg = automation.nightMessage().replace('name',u[1])
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
