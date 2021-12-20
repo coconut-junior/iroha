@@ -45,14 +45,14 @@ def rephrase(text):
 
 def getUptime():
     global uptime
-    if uptime < 1:
+    if uptime < 60:
         return "less than a minute"
-    elif uptime == 1:
+    elif uptime == 60:
         return "about a minute"
-    elif uptime >1 and uptime <60:
-        return str(uptime) + " minutes"
+    elif uptime > 60 and uptime < 3600:
+        return str(uptime/60) + " minutes"
     else:
-        return str(uptime/60) + " hours"
+        return str(uptime/60/60) + " hours"
 
 def execute(task):
     if task == 'laugh':
@@ -74,6 +74,8 @@ def add_years(d, years):
 def createReminder(text, channel):
     numbers = [':','0','1','2','3','4','5','6','7','8','9']
     print('setting reminder...')
+    if 'to' in text:
+        text = text[text.index('to')+3:len(text)]
 
     text=text.replace('please', "")
     text=text.replace('reminder', "")

@@ -395,6 +395,10 @@ def getAnswer(text,channel):
             lights.turn_off()
         if not polite:
             answers = ["would it kill you to ask nicely?"]
+    elif ('remind me' in text) or ('set' in text and 'reminder' in text):
+        answers = ['You can count on me!', "sure, i'll make sure you remember!"]
+        automation.createReminder(text, channel) #only use for testing on local machine
+
 
     #question
     elif isQuestion(text):
@@ -591,10 +595,7 @@ def getAnswer(text,channel):
     elif 'how about you' in last_answer:
         answers = ['ooh nice!!']
     elif getType(sentence[0]) == 'v':
-        if ('remind me' in text) or ('set' in text and 'reminder' in text):
-            answers = ['You can count on me!', "sure, i'll make sure you remember!"]
-            automation.createReminder(text, channel) #only use for testing on local machine
-        elif 'shut up' in text or 'be quiet' in text:
+        if 'shut up' in text or 'be quiet' in text:
             answers = ["got it... I won't speak unless spoken to","have you got any manners?? i'll be quiet though"]
         elif 'be' in sentence and 'back' in sentence:
             answers = ["that's fine! i'll wait here","you promise you'll be back? it gets lonely when i have nobody to talk to..."]

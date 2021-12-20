@@ -22,6 +22,7 @@ sleep_time = [random.randint(22,23),random.randint(0,30)]
 checkin_time = str(random.randint(12,20)) + ":" + str(random.randint(0,30))
 wait_time = 0
 cache = []
+debug = False
 
 class MyClient(discord.Client):
 
@@ -38,8 +39,8 @@ class MyClient(discord.Client):
         print('client id: ' + str(client.user.id))
         print('------')
         print('current date is ' + str(date.today()))
-        print('wake time is set to ' + wake_time)
-        
+        print('wake time set ' + str(wake_time[0]) + ':' + str(wake_time[1]))
+
         while True:
             global wait_time
             global cache
@@ -62,6 +63,7 @@ class MyClient(discord.Client):
                     m = r['message']
                     channel = client.get_channel(r['channel'])
                     await channel.send("hey looks like it's time to " + m)
+                    time.sleep(60)
 
             #message everyone iroha knows
             if not msg == None:
@@ -69,14 +71,13 @@ class MyClient(discord.Client):
                     channel = client.get_channel(c)
                     await channel.send(msg)
             
-            #operate once a minute
-            await asyncio.sleep(60)
+            #operate once a second
+            await asyncio.sleep(1)
             automation.uptime += 1
             wait_time += 1
             users = database.getAll()
-            t = time.localtime()
-            hour = t.tm_hour
-            minute = t.tm_min
+            hour = t[0]
+            minute = t[1]
 
             for u in users:
                 uid = str(u[0])
@@ -86,24 +87,31 @@ class MyClient(discord.Client):
                 if last_answer == None:
                     last_answer = ''
                 last_message = u[3]
+
+                if debug:
+                    print(last_answer)
+                    print(last_message)
                 
-                if wait_time == 4 and '?' in last_answer and not 'really' in last_answer and not channel == None:
+                if wait_time == 240 and '?' in last_answer and not 'really' in last_answer and not channel == None:
                     annoyed_msg = ["hey you still there",
                             "heyyy i asked you a question silly"]
                     msg = annoyed_msg[random.randint(0,len(annoyed_msg)-1)]
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
+                    time.sleep(60)
 
                 if hour == wake_time[0] and minute == wake_time[1] and not 'morning' in last_answer and not channel == None:
                     msg = automation.morningMessage().replace('name',u[1])
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
+                    time.sleep(60)
                 if hour == sleep_time[0] and minute == sleep_time[1] and not 'night' in last_answer and not 'dream' in last_answer and not 'bed' in last_answer and not channel == None:
                     msg = automation.nightMessage().replace('name',u[1])
                     await channel.send(msg)
                     database.updateUser(u[0],u[1],u[2],u[3],msg,u[5])
+                    time.sleep(60)
                 
-            if wait_time == 4:
+            if wait_time == 240:
                 wait_time = 0
     
     async def on_message(self, message):
